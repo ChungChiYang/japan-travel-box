@@ -356,7 +356,46 @@
                 flex-shrink: 0 !important;
             }
         }
-		
+		/* ==================== 📱 按鈕防超出格子精確修正 ==================== */
+        @media (max-width: 768px) {
+            
+            /* 🎯 1. 修正「3. 物品點檢」那一橫排：允許輸入框與按鈕在極窄螢幕下自動調整 */
+            .section-card > div:first-child,
+            div[style*="justify-content: space-between"] {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: wrap !important; /* ⚡ 關鍵 1：如果真的太擠，允許按鈕自動掉到下一行，絕對不撐破框 */
+                align-items: center !important;
+                gap: 6px !important; /* 縮小元件之間的間距 */
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* 微調物品點檢的按鈕，稍微縮小手機版的內距，爭取空間 */
+            .section-card button.btn, 
+            .section-card > div:first-child button {
+                padding: 6px 10px !important; /* ⚡ 關鍵 2：縮小按鈕胖度 (原本可能太寬) */
+                font-size: 0.85rem !important;
+                flex-shrink: 0 !important; /* 防止按鈕字體被壓扁 */
+            }
+
+            /* 🎯 2. 修正「4. 每日行程」的一鍵全覽、增天數、減天數那一排 */
+            /* 找到包著這三個按鈕的 div 容器 (原本電腦版可能是橫排) */
+            .section-card div[style*="display: flex"] {
+                flex-wrap: wrap !important; /* 允許按鈕寬度不夠時自動換行 */
+                gap: 6px !important;       /* 縮小按鈕之間的縫隙 */
+            }
+
+            /* 讓這三個功能按鈕在手機版上平分空間，或者改成更好點擊的比例 */
+            .section-card div[style*="display: flex"] > button,
+            .section-card div[style*="display: flex"] > a {
+                flex: 1 1 auto !important;   /* 讓按鈕自動等寬伸縮 */
+                min-width: 70px !important;  /* 給減天數按鈕一個合理的最小寬度 */
+                padding: 8px 6px !important; /* 稍微縮減按鈕左右內距 */
+                font-size: 0.85rem !important;
+                box-sizing: border-box !important;
+            }
+        }
 		
 		
         #importInput { display: none; }
