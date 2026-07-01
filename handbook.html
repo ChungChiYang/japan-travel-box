@@ -214,34 +214,47 @@
 		
 /* ==================== 📱 僅針對時間欄位的手機版精確修正 ==================== */
         @media (max-width: 768px) {
-            /* 🎯 精確指定：只有在「插入行程區」裡面的時間群組，才在手機上改成垂直排列 */
-            /* 這樣做絕對不會牽連到下方的記帳、行李或任何格子的排版 */
-            .add-sch-box div[style*="display: grid"],
-            .add-sch-box div[style*="display: flex"],
-            .add-sch-box .info-grid {
-                display: flex !important;
-                flex-direction: column !important; /* 電腦版原本是並排，手機版強制拆成上下兩行 */
-                gap: 10px !important;
+            /* 🎯 1. 抓取插入行程區與行內編輯區內，所有 display 佈局，強制切斷橫向並排 */
+            .add-sch-box div[style*="display"],
+            .add-sch-box .info-grid,
+            .edit-inline-box {
+                display: block !important; /* 捨棄 Flex/Grid，直接用最原始的區塊流，絕對會上下排 */
+                width: 100% !important;
             }
 
-            .add-sch-box .form-group {
+            /* 🎯 2. 讓時間與標題的外層容器 100% 滿版，且絕不允許溢出 */
+            .add-sch-box .form-group,
+            .edit-inline-box .form-group {
                 width: 100% !important;
                 max-width: 100% !important;
-                box-sizing: border-box !important;
-            }
-
-            /* 強制重塑 iOS Safari 的時間選擇器，徹底剝奪它的任性寬度 */
-            .add-sch-box input[type="time"] {
-                width: 100% !important;
-                max-width: 100% !important;
-                min-width: 0 !important; /* 破除 iOS 內建最小寬度的物理限制 */
                 box-sizing: border-box !important;
                 display: block !important;
-                -webkit-appearance: listbox !important; /* 強制 iOS 使用標準文字框盒模型 */
-                padding: 0.6rem !important;
+                margin-bottom: 12px !important; /* 欄位上下錯開 */
+            }
+
+            /* 🎯 3. 終極魔王：地毯式重塑所有 time 欄位 */
+            .add-sch-box input[type="time"],
+            .edit-inline-box input[type="time"],
+            input[type="time"] {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important; /* 強行粉碎 iOS 內建最小寬度 */
+                
+                /* ⚡ 核心關鍵：徹底剝奪 iOS Safari 的流氓原生外觀 */
+                -webkit-appearance: none !important; 
+                -moz-appearance: none !important;
+                appearance: none !important;
+                
+                /* 縮小內距與字體，防止內部文字把外框塞爆 */
+                padding: 8px 6px !important; 
+                font-size: 0.9rem !important;
+                
+                box-sizing: border-box !important;
+                float: none !important; /* 防浮動干擾 */
             }
         }
-
+		
 		
         #importInput { display: none; }
 
@@ -403,7 +416,7 @@
             <div class="section-title">
                 <span>4. 每日行程</span>
                 <div style="display:flex; gap:8px;">
-                    <button class="btn btn-s btn-sm" id="view-toggle-btn" onclick="toggleViewMode()">👁️ 一鍵全覽(轉印PDF)模式</button>
+                    <button class="btn btn-s btn-sm" id="view-toggle-btn" onclick="toggleViewMode()">一鍵全覽</button>
                     <button class="btn btn-p btn-sm" onclick="addDayTab()">➕ 增天數</button>
                     <button class="btn btn-d btn-sm" onclick="deleteDayTab()">🗑️ 減天數</button>
                 </div>
@@ -513,7 +526,7 @@
                     isAllViewMode = false;
                     const btn = document.getElementById('view-toggle-btn');
                     const sec = document.getElementById('sec-schedule');
-                    btn.innerText = "👁️ 一鍵全覽(轉印PDF)模式";
+                    btn.innerText = "一鍵全覽(轉印PDF)模式";
                     sec.classList.remove('view-all-mode');
                     refreshScheduleView();
                 }
@@ -617,7 +630,7 @@
                 btn.innerText = "📱 切換：分頁標籤模式";
                 sec.classList.add('view-all-mode');
             } else {
-                btn.innerText = "👁️ 一鍵全覽";
+                btn.innerText = "一鍵全覽";
                 sec.classList.remove('view-all-mode');
             }
             refreshScheduleView();
