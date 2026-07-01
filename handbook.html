@@ -210,77 +210,102 @@
             border: 1px solid #eccacc; 
             line-height: 1.6;
         }
-/* ==================== 📱 隨身路書手機版 RWD 最終完美升級版 ==================== */
+/* ==================== 📱 隨身路書手機版 RWD 最終完美修正版 ==================== */
         @media (max-width: 768px) {
-            /* --- 痛點 3 修正：縮小路書內部的頂部資訊區，不讓它佔據大版面 --- */
-            /* 如果原本的標題區有 sticky，強制解除固定，讓它隨網頁滾動滑走 */
-            .navbar, 
+            /* --- 痛點 1 修正：強力解除粉藍漸層 header 的固定狀態，讓它絕對能隨網頁滾動滑走 --- */
+            /* 針對路書內所有可能寫了固定定位的頂部區塊，全部強制改為跟隨捲軸 */
+            header,
+            .navbar,
             div[style*="position: sticky"],
-            div[style*="position:webkit-sticky"] {
+            div[style*="position: fixed"],
+            div[style*="-webkit-sticky"] {
                 position: relative !important; 
                 top: auto !important;
-                padding: 0.6rem 1rem !important; /* 大幅縮減內距 */
+                background: linear-gradient(135deg, #ff758f, #a2d2ff) !important;
+                padding: 1rem !important; /* 縮減內距釋放空間 */
+                margin-bottom: 1rem !important;
             }
             
-            /* 縮小標題文字與按鈕圖示，釋放垂直空間 */
-            h1, .navbar h1 { font-size: 1.1rem !important; }
-            .btn { padding: 0.4rem 0.8rem !important; font-size: 0.78rem !important; }
+            /* 如果那個粉藍漸層的大標題是用特定高度撐開的，強制自適應 */
+            div[style*="height"] {
+                height: auto !important;
+            }
 
-            /* --- 痛點 1 修正：讓 Day1 ~ Day4 天數標籤可以流暢左右滑動 --- */
+            /* --- 痛點 3 修正：解決時間欄位（開始/結束時間）凸出外框的問題 --- */
+            /* 針對時間選擇器進行盒模型重塑，並消除 iOS Safari 的預設外觀 */
+            input[type="time"],
+            input[type="date"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                -webkit-appearance: none !important; /* 消除 iOS 內建樣式干擾 */
+                padding: 0.5rem !important; /* 稍微縮小內距，防止撐破 */
+                min-width: 0 !important;
+            }
+
+            /* --- 天數標籤維持流暢左右滑動 --- */
             .days-tabs {
                 display: flex !important;
-                flex-wrap: nowrap !important; /* 絕對不換行 */
-                overflow-x: auto !important;  /* 開啟橫向滑動 */
-                -webkit-overflow-scrolling: touch !important; /* 讓 iOS 滑動有流暢的彈性阻尼感 */
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
                 padding-bottom: 8px !important;
                 border-bottom: 1px solid #ffe5ec;
             }
             .tab-btn {
-                flex: 0 0 auto !important; /* 阻止天數按鈕被擠壓變形 */
+                flex: 0 0 auto !important;
                 padding: 0.4rem 1rem !important;
             }
 
-            /* --- 痛點 2 修正：徹底解決地圖網址與行程備註爆開欄位的問題 --- */
-            /* 針對截圖中並排的「連結/地圖網址」與「行程備註」欄位群組 */
+            /* --- 欄位與按鈕全面防破圖直立堆疊 --- */
             .info-grid,
-            div[style*="display: grid"],
-            div[style*="display: flex"] {
-                grid-template-columns: 1fr !important; /* 電腦版可能寫 1fr 1fr，手機版強制拆成單列 */
+            .add-sch-box div[style*="display: grid"],
+            .add-sch-box div[style*="grid-template-columns"],
+            .add-sch-box div[style*="display: flex"],
+            .edit-inline-box {
+                grid-template-columns: 1fr !important;
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 12px !important;
             }
 
-            /* 確保「連結/地圖網址」和「行程備註」的外層包裹 div 100% 滿版 */
             .form-group {
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box !important;
             }
 
-            /* 修正文字框與輸入框，全面重塑盒模型，絕不撐破外殼 */
             input, select, textarea,
             input[type="text"],
             .textarea-name,
             .memo-area {
                 width: 100% !important;
                 max-width: 100% !important;
-                min-width: 0 !important; /* 極重要：消除瀏覽器對 input 預設的 min-width 限制 */
+                min-width: 0 !important;
                 box-sizing: border-box !important;
                 display: block !important;
             }
 
-            /* 行程備註的 textarea 往往有內建 rows 或 cols，手機版微調高度即可 */
             textarea {
                 height: 60px !important;
                 resize: none;
             }
 
-            /* 萬用卡片微調：手機上縮小左右間距，爭取表單伸展空間 */
             .section-card {
                 padding: 1rem !important;
                 margin-bottom: 1.5rem !important;
                 border-radius: 12px !important;
+            }
+
+            /* 一鍵全覽、增減天數按鈕在手機上垂直排列 */
+            .section-card > div[style*="display: flex"] {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .section-card > div[style*="display: flex"] button,
+            .section-card > div[style*="display: flex"] a {
+                width: 100% !important;
+                justify-content: center !important;
             }
         }
 
