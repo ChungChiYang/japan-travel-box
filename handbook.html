@@ -396,6 +396,46 @@
                 box-sizing: border-box !important;
             }
         }
+		/* ==================== 📱 預算與記帳區文字消失精確修正 ==================== */
+        @media (max-width: 768px) {
+            
+            /* 🎯 1. 找到包著記帳每一行的容器 (原本電腦版可能是橫向並排) */
+            /* 請根據你實際的 class 名稱調整，這裡鎖定預算區卡片內的每一列 */
+            .section-card table, 
+            .section-card tbody, 
+            .section-card tr {
+                display: block !important;
+                width: 100% !important;
+            }
+
+            /* 🎯 2. 如果你是用 Flexbox 做的記帳橫排（最常見），強迫它在手機版微調比例 */
+            /* 讓左邊的「類別名稱」絕對不准縮小，並且有固定寬度顯示文字 */
+            div[style*="display: flex"] > span:first-child,
+            .budget-row > .category-label,
+            td:first-child {
+                min-width: 70px !important; /* ⚡ 關鍵：給類別文字一個至少 70px 的保證生存空間 */
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+                font-size: 0.9rem !important;
+                display: inline-block !important;
+            }
+
+            /* 🎯 3. 縮小記帳區所有輸入框（預估、實際金額）的胖度與內距，把空間還給類別 */
+            .section-card input[type="number"],
+            div[style*="display: flex"] input {
+                width: 100% !important;
+                min-width: 0 !important; /* 允許輸入框縮小 */
+                padding: 6px 4px !important; /* 縮小左右內距 */
+                font-size: 0.85rem !important;
+                text-align: center !important;
+            }
+
+            /* 🎯 4. 如果是用表格 table 做的預算表，在手機版將欄位精細平分 */
+            th, td {
+                padding: 6px 4px !important;
+                font-size: 0.85rem !important;
+            }
+        }
 		
 		
         #importInput { display: none; }
