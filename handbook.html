@@ -416,7 +416,7 @@
             <div class="section-title">
                 <span>4. 每日行程  </span>
                 <div style="display:flex; gap:8px;">
-                    <button class="btn btn-s btn-sm" id="view-toggle-btn" onclick="toggleViewMode()">一鍵全覽</button>
+                    <button class="btn btn-s btn-sm" id="view-toggle-btn" onclick="toggleViewMode()">一鍵全覽  </button>
                     <button class="btn btn-p btn-sm" onclick="addDayTab()">➕ 增天數</button>
                     <button class="btn btn-d btn-sm" onclick="deleteDayTab()">🗑️ 減天數</button>
                 </div>
@@ -526,7 +526,7 @@
                     isAllViewMode = false;
                     const btn = document.getElementById('view-toggle-btn');
                     const sec = document.getElementById('sec-schedule');
-                    btn.innerText = "一鍵全覽(轉印PDF)模式";
+                    btn.innerText = "一鍵全覽  ";
                     sec.classList.remove('view-all-mode');
                     refreshScheduleView();
                 }
@@ -630,7 +630,7 @@
                 btn.innerText = "📱 切換：分頁標籤模式";
                 sec.classList.add('view-all-mode');
             } else {
-                btn.innerText = "一鍵全覽";
+                btn.innerText = "一鍵全覽  ";
                 sec.classList.remove('view-all-mode');
             }
             refreshScheduleView();
