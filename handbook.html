@@ -212,47 +212,130 @@
             line-height: 1.6;
         }
 		
-/* ==================== 📱 僅針對時間欄位的手機版精確修正 ==================== */
+/* ==================== 📱 隨身路書手機版 RWD 完美收納版 ==================== */
         @media (max-width: 768px) {
-            /* 🎯 1. 抓取插入行程區與行內編輯區內，所有 display 佈局，強制切斷橫向並排 */
+            /* --- ⚙️ 側選單/主容器 Flex 排序調整（關鍵：讓 navbar 自動掉到最底部） --- */
+            body {
+                display: flex !important;
+                flex-direction: column !important;
+                height: auto !important;
+                overflow-y: auto !important;
+            }
+            
+            /* 將路書的主容器設定為 flex 佈局，方便透過 order 調整元件上下順序 */
+            .main-container,
+            body > div:not(.navbar) {
+                display: flex !important;
+                flex-direction: column !important;
+                margin-top: 0 !important;
+                padding: 10px 8px !important;
+            }
+
+            /* --- 修正 2：把原本置頂的 .navbar 搖身一變，變成放在最底部的專用備份卡片 --- */
+            .navbar {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                display: flex !important;
+                flex-direction: column !important; /* 按鈕群改為垂直排列 */
+                order: 99 !important; /* ⚡ 關鍵：強制把這一塊丟到網頁的最底部 */
+                background: #ffffff !important; /* 換成乾淨的白色背景 */
+                border: 2px dashed #ffb3c1 !important; /* 少女風的精緻虛線備份箱框線 */
+                padding: 1.2rem 1rem !important;
+                margin: 2rem 8px 1rem 8px !important;
+                border-radius: 14px !important;
+                width: calc(100% - 16px) !important;
+                box-sizing: border-box !important;
+                box-shadow: none !important;
+                height: auto !important;
+            }
+
+            /* 重新微調手機版的最底部標題文字與樣式 */
+            .navbar h1 {
+                color: #ff758f !important;
+                font-size: 1.1rem !important;
+                margin: 0 0 1rem 0 !important;
+                text-align: center !important;
+                width: 100% !important;
+            }
+            /* 讓標題在手機上自動加上前綴，看起來更像功能區 */
+            .navbar h1::before {
+                content: "⚙️ 手機版 " !important;
+            }
+
+            /* 讓包著按鈕的容器在最下方滿版撐開 */
+            .navbar .nav-links {
+                display: flex !important;
+                flex-direction: column !important; /* 按鈕改為上下堆疊，超好點選 */
+                width: 100% !important;
+                gap: 10px !important;
+            }
+
+            /* 強制美化所有的 PDF、導出、導入按鈕，變成手機好按的大按鈕 */
+            .navbar .btn {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                padding: 12px !important;
+                font-size: 0.95rem !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                margin: 0 !important;
+                border-radius: 8px !important;
+                height: auto !important;
+            }
+
+            /* 🎯 徹底消滅「導入」旁邊那個破圖、刺穿出來的原生醜按鈕 */
+            .navbar input[type="file"] {
+                display: none !important; 
+            }
+
+            /* --- 修正 1：每日行程的各個填寫欄位滿版、上下對齊美化 --- */
             .add-sch-box div[style*="display"],
             .add-sch-box .info-grid,
             .edit-inline-box {
-                display: block !important; /* 捨棄 Flex/Grid，直接用最原始的區塊流，絕對會上下排 */
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
                 width: 100% !important;
             }
-
-            /* 🎯 2. 讓時間與標題的外層容器 100% 滿版，且絕不允許溢出 */
-            .add-sch-box .form-group,
-            .edit-inline-box .form-group {
+            .form-group {
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box !important;
-                display: block !important;
-                margin-bottom: 12px !important; /* 欄位上下錯開 */
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 4px !important;
             }
-
-            /* 🎯 3. 終極魔王：地毯式重塑所有 time 欄位 */
-            .add-sch-box input[type="time"],
-            .edit-inline-box input[type="time"],
-            input[type="time"] {
-                display: block !important;
+            input, select, textarea, input[type="text"], input[type="time"], .textarea-name, .memo-area {
                 width: 100% !important;
                 max-width: 100% !important;
-                min-width: 0 !important; /* 強行粉碎 iOS 內建最小寬度 */
-                
-                /* ⚡ 核心關鍵：徹底剝奪 iOS Safari 的流氓原生外觀 */
-                -webkit-appearance: none !important; 
-                -moz-appearance: none !important;
-                appearance: none !important;
-                
-                /* 縮小內距與字體，防止內部文字把外框塞爆 */
-                padding: 8px 6px !important; 
-                font-size: 0.9rem !important;
-                
+                min-width: 0 !important;
                 box-sizing: border-box !important;
-                float: none !important; /* 防浮動干擾 */
+                display: block !important;
+                padding: 10px !important;
+                font-size: 0.95rem !important;
+                border-radius: 8px !important;
+                -webkit-appearance: none !important;
             }
+            textarea { height: 70px !important; resize: none; }
+            .section-card { padding: 1.2rem 1rem !important; margin-bottom: 1.5rem !important; border-radius: 14px !important; }
+
+            /* --- 天數選單橫向流暢滾動保持 --- */
+            .days-tabs {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding-bottom: 8px !important;
+                margin-bottom: 1rem !important;
+            }
+            .tab-btn { flex: 0 0 auto !important; padding: 0.4rem 1rem !important; }
+
+            /* 功能按鈕區（一鍵全覽、增減天數）垂直滿版堆疊 */
+            .section-card > div[style*="display: flex"] { flex-direction: column !important; gap: 8px !important; }
+            .section-card > div[style*="display: flex"] button, .section-card > div[style*="display: flex"] a { width: 100% !important; justify-content: center !important; }
         }
 		
 		
