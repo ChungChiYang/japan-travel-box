@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 我的專屬自由行隨身路書與規劃看板 (PDF完美防壓字版)</title>
+    <style>
+        :root {
+            --primary: #ffb3c1;       /* 櫻花粉 */
+            --primary-dark: #ff758f;  /* 深櫻花粉 */
+            --secondary: #a2d2ff;     /* 富士藍 */
+            --secondary-dark: #70a6ff;
+            --success: #b7e4c7;       /* 抹茶綠 */
+            --success-dark: #52b788;
+            --danger: #ffccd5;
+            --danger-dark: #ff4d6d;
+            --dark: #2b2d42;          /* 質感深灰 */
+            --bg: #fff5f5;            /* 溫暖微粉底色 */
+            --card: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* 頂部美麗的導覽列 */
+        .navbar {
+            background: linear-gradient(135deg, #ff758f, #a2d2ff);
+            color: white;
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .navbar h1 { margin: 0; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .nav-links { display: flex; gap: 12px; align-items: center; }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { background: rgba(255, 255, 255, 0.3); }
+
+        .main-container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+
+        /* 萬用卡片樣式 */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 8px 20px rgba(230, 170, 170, 0.15);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            scroll-margin-top: 90px;
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: #1d3557;
+            border-left: 6px solid var(--primary-dark);
+            padding-left: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 表單元素基本樣式 */
+        input, select, textarea {
+            padding: 0.6rem;
+            border: 1px solid #eccacc;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: #fffafb;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary-dark); box-shadow: 0 0 5px rgba(255,117,143,0.3); }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; color: #6c757d; font-weight: bold; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+
+        /* 甜美調色鈕 */
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.88rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.8rem; border-radius: 12px; }
+        .btn-p { background: var(--primary-dark); color: white; }
+        .btn-p:hover { background: #ff4d6d; }
+        .btn-s { background: var(--secondary); color: #1d3557; }
+        .btn-s:hover { background: var(--secondary-dark); color: white; }
+        .btn-d { background: var(--danger); color: var(--danger-dark); }
+        .btn-d:hover { background: var(--danger-dark); color: white; }
+        .btn-pdf { background: #ff4d6d; color: white; box-shadow: 0 4px 8px rgba(255,77,109,0.3); }
+        .btn-pdf:hover { background: #c9184a; }
+
+        /* 記帳區寬度調配 */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { padding: 0.6rem; border-bottom: 1px solid #f9e6e6; font-size: 0.9rem; vertical-align: top; }
+        th { background-color: #fff0f2; color: #a15c68; text-align: left; padding: 0.8rem 0.6rem; }
+        .t-footer { font-weight: bold; background-color: #fff0f2; color: #ff4d6d; }
+        
+        .input-category { width: 100px; } 
+        .input-amount { width: 120px; }
+        
+        .textarea-name { 
+            width: 100%; 
+            min-width: 200px; 
+            height: 38px; 
+            min-height: 38px;
+            resize: none; 
+            overflow-y: hidden;
+            line-height: 1.4;
+            display: block;
+        }
+
+        /* 行李打包區 */
+        .checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff9f9;
+            padding: 0.35rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            border: 1px solid #fce4e4;
+        }
+        .check-item input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary-dark); }
+        .check-item .del-check { margin-left: auto; color: var(--danger-dark); cursor: pointer; display: none; font-weight: bold; }
+        .check-item:hover .del-check { display: inline; }
+
+        /* 每日行程排版 */
+        .days-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn {
+            padding: 0.5rem 1.2rem;
+            background: #fff;
+            border: 1px solid var(--primary);
+            color: var(--primary-dark);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .tab-btn.active { background: var(--primary-dark); color: white; }
+
+        .print-day-block { margin-bottom: 2rem; }
+        .print-day-title { font-size: 1.2rem; color: #ff758f; margin-bottom: 1rem; padding-bottom: 3px; border-bottom: 2px dashed #ffb3c1; display: none; }
+        
+        .view-all-mode .print-day-title { display: block; }
+        .view-all-mode .days-tabs { display: none; }
+
+        .timeline { position: relative; border-left: 3px solid #ffccd5; margin-left: 30px; padding-left: 20px; }
+        .timeline-item { position: relative; margin-bottom: 1.2rem; background: #fffafb; padding: 1rem; border-radius: 12px; border: 1px solid #fcdad7; }
+        .timeline-item::before { content: '🌸'; position: absolute; left: -31px; top: 12px; font-size: 13px; }
+        .time-badge { font-weight: bold; color: #ff4d6d; background: #ffe5ec; padding: 0.15rem 0.6rem; border-radius: 12px; font-size: 0.85rem; }
+        .schedule-main { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-weight: bold; }
+        .sub-topic { background: #e0f2fe; color: #0369a1; padding: 0.1rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        .sch-note { color: #5c677d; font-size: 0.85rem; white-space: pre-line; background: #fff; padding: 0.6rem; border-radius: 6px; border: 1px solid #fcdad7; margin-top: 8px; }
+
+        .edit-inline-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 5px;
+            background: #fff0f2;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* 隨手備註區 */
+        .memo-area { 
+            width: 100%; 
+            min-height: 150px; 
+            height: auto; 
+            overflow-y: hidden;
+            resize: vertical; 
+            padding: 12px; 
+            font-size: 0.95rem; 
+            border-radius: 8px; 
+            border: 1px solid #eccacc; 
+            line-height: 1.6;
+        }
+
+        #importInput { display: none; }
+
+        /* ==================== 🖨️ PDF / 列印專用防分割與寬度重配語法 ==================== */
+        @media print {
+            @page { 
+                size: landscape; 
+                margin: 0.8cm;  
+            }
+            
+            body { 
+                background: white; 
+                color: black; 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important;         
+            }
+
+            /* 🎯 關鍵修正：強制將置頂定位取消，避免滾動到中下方列印時，背景與標題壓在畫面上 */
+            .navbar {
+                display: flex !important; 
+                position: relative !important; /* 解除 sticky，讓它乖乖留在第一頁頂部 */
+                top: auto !important;
+                background: linear-gradient(135deg, #ff758f, #a2d2ff) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+            }
+            
+            .nav-links, .control-panel, .btn, td:last-child, th:last-child, .add-sch-box { 
+                display: none !important; 
+            }
+
+            .main-container {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                transform: scale(0.92); 
+                transform-origin: top left;
+            }
+
+            .section-card { 
+                box-shadow: none !important; 
+                border: 1px solid #fcdad7 !important; 
+                padding: 1.5rem !important; 
+                margin-bottom: 1.5rem !important;
+                page-break-inside: avoid; 
+                break-inside: avoid;
+            }
+
+            .print-day-block { 
+                page-break-before: always; 
+                break-before: page; 
+                margin-bottom: 0; 
+                padding-top: 0.5rem; 
+            }
+            
+            #sec-schedule .print-day-block:first-of-type { 
+                page-break-before: avoid !important; 
+                break-before: avoid !important; 
+            }
+
+            .timeline-item { 
+                page-break-inside: avoid; 
+                break-inside: avoid; 
+                border: 1px solid #fcdad7 !important; 
+            }
+	    /* 🎯 貼心加入：讓列印的表格文字更有質感、不擁擠 */
+            th, td { 
+                padding: 0.8rem 0.6rem !important; /* 加大上下間距 */
+                line-height: 1.5 !important;       /* 設定舒適的行高 */
+                font-size: 0.85rem !important;     /* 稍微縮小字體，爭取更多橫向空間 */
+            }
+            
+            .textarea-name, input, textarea { 
+                border: none !important; 
+                background: transparent !important; 
+                padding: 0 !important; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 頂部導覽列 -->
+    <nav class="navbar">
+        <h1>🌸 Alex 的萬用自由行隨身路書</h1>
+        <div class="nav-links">
+            <button class="btn btn-pdf btn-sm" onclick="exportToPDF()">🖨️ 一鍵匯出 PDF</button>
+            <button class="btn btn-s btn-sm" onclick="exportJSON()">📤 導出 JSON</button>
+            <button class="btn btn-s btn-sm" onclick="document.getElementById('importInput').click()">📥 導入 JSON</button>
+            <input type="file" id="importInput" accept=".json" onchange="importJSON(event)">
+        </div>
+    </nav>
+
+    <div class="main-container">
+
+        <!-- 1. 基本資訊總覽與匯率設定 -->
+        <section id="sec-info" class="section-card">
+            <div class="section-title">1. 基本資訊總覽與匯率設定</div>
+            <div class="info-grid">
+                <div class="form-group"><label>目的地/主題</label><input type="text" id="trip-title" value="日本東京5天4夜自由行" onchange="saveData()"></div>
+                <div class="form-group"><label>出發日期</label><input type="date" id="trip-start" value="2026-10-01" onchange="saveData()"></div>
+                <div class="form-group"><label>結束日期</label><input type="date" id="trip-end" value="2026-10-05" onchange="saveData()"></div>
+                <div class="form-group"><label>外幣幣值</label><input type="text" id="currency-name" value="JPY" onchange="updateCurrencyLabels()"></div>
+                <div class="form-group"><label>匯率設定</label><input type="number" id="currency-rate" value="0.215" step="0.001" onchange="calcBudget()"></div>
+            </div>
+        </section>
+
+        <!-- 2. 預算與即時記帳分配 -->
+        <section id="sec-budget" class="section-card">
+            <div class="section-title">
+                <span>2. 預算與即時記帳分配</span>
+                <button class="btn btn-p btn-sm" onclick="addBudgetItem()">➕ 新增帳目</button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:110px;">類別</th>
+                            <th>項目名稱 (支援多行自動長大)</th>
+                            <th class="lbl-cur-est">預估(JPY)</th>
+                            <th class="lbl-cur-act">實際(JPY)</th>
+                            <th>實際(TWD)</th>
+                            <th>自動折合(TWD)</th>
+                            <th style="width:50px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="budget-tbody"></tbody>
+                    <tfoot>
+                        <tr class="t-footer">
+                            <td colspan="2" style="text-align: right; padding-right: 15px;">總計金額</td>
+                            <td id="total-est-fc">0</td>
+                            <td id="total-act-fc">0</td>
+                            <td id="total-act-twd">0</td>
+                            <td id="total-auto-twd">0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. 行李與重要物品點檢 -->
+        <section id="sec-pack" class="section-card">
+            <div class="section-title">
+                <span>3. 行李與重要物品點檢</span>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="new-pack-name" placeholder="快速補件..." style="padding:0.2rem 0.5rem; font-size:0.85rem; width:120px;">
+                    <button class="btn btn-p btn-sm" onclick="addPackItem()">➕ 新增</button>
+                </div>
+            </div>
+            <div class="checklist-grid" id="pack-grid"></div>
+        </section>
+
+        <!-- 4. 每日行程與地圖導航 -->
+        <section id="sec-schedule" class="section-card">
+            <div class="section-title">
+                <span>4. 每日行程與地圖導航</span>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-s btn-sm" id="view-toggle-btn" onclick="toggleViewMode()">👁️ 一鍵全覽(轉印PDF)模式</button>
+                    <button class="btn btn-p btn-sm" onclick="addDayTab()">➕ 增天數</button>
+                    <button class="btn btn-d btn-sm" onclick="deleteDayTab()">🗑️ 減天數</button>
+                </div>
+            </div>
+
+            <div class="days-tabs" id="days-tabs-container"></div>
+
+            <!-- 新增行程區塊 -->
+            <div class="add-sch-box" style="margin-bottom: 1.5rem; background: #fffcfc; padding: 1.2rem; border-radius: 12px; border: 1px solid #fcdad7;">
+                <h4 style="margin: 0 0 10px 0; color:#ff758f;">⏰ 在目前選定天數下插入行程</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom:10px;">
+                    <div class="form-group"><label>開始時間</label><input type="time" id="sch-time-start" value="09:00"></div>
+                    <div class="form-group"><label>結束時間</label><input type="time" id="sch-time-end" value="10:00"></div>
+                    <div class="form-group"><label>大主題標籤</label><input type="text" id="sch-label" placeholder="例: 航班/美食/景點"></div>
+                    <div class="form-group"><label>小主題/名稱</label><input type="text" id="sch-title" placeholder="例: 去程航班前進東京"></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom:10px;">
+                    <div class="form-group"><label>連結/地圖網址</label><input type="text" id="sch-url" placeholder="貼上 Google Maps 或官網網址"></div>
+                    <div class="form-group"><label>行程備註</label><textarea id="sch-note" placeholder="例: 機場臨櫃報到，確認公斤數..." rows="1"></textarea></div>
+                </div>
+                <button class="btn btn-p btn-sm" style="width: 100%; justify-content: center;" onclick="addScheduleItem()">✨ 新增此段行程 (自動按時間排序)</button>
+            </div>
+
+            <div id="schedule-wrapper-box"></div>
+        </section>
+
+        <!-- 5. 個人與隨手備註區 -->
+        <section id="sec-memo" class="section-card">
+            <div class="section-title">5. 個人與隨手備註區</div>
+            <textarea id="memo-input" class="memo-area" placeholder="臨時想到的點子、代購清單，直接貼在這裡..." oninput="autoGrow(this)" onchange="saveData()"></textarea>
+        </section>
+
+    </div>
+
+    <script>
+        // 資料模型
+        let plannerData = {
+            title: "日本東京5天4夜自由行", startDate: "2026-10-01", endDate: "2026-10-05", curName: "JPY", curRate: 0.215,
+            budget: [
+                { category: "交通", name: "去程來回機票加上兩件23公斤行李託運費用(含稅金)", estFC: 0, actFC: 0, actTWD: 12500 },
+                { category: "住宿", name: "東京上野站前可可尼家庭特別高級雙人豪華溫泉大飯店4晚 (雙床房/不含早)", estFC: 60000, actFC: 58000, actTWD: 0 }
+            ],
+            checklist: [
+                { name: "護照/簽證", checked: true }, { name: "日幣現金", checked: false }, { name: "行動電源", checked: false }
+            ],
+            days: [
+                {
+                    dayNum: 1,
+                    items: [
+                        { timeStart: "08:50", timeEnd: "13:15", label: "航班", title: "去程航班前進東京", note: "機場臨櫃報到，確認行李公斤數並領取實體機票", url: "https://www.google.com" },
+                        { timeStart: "14:30", timeEnd: "15:30", label: "交通", title: "搭乘 Skyliner 到上野", note: "憑 QR Code 去櫃檯換特急券", url: "" }
+                    ]
+                },
+                { dayNum: 2, items: [] }, { dayNum: 3, items: [] }, { dayNum: 4, items: [] }, { dayNum: 5, items: [] }
+            ],
+            memo: ""
+        };
+
+        let currentDayIdx = 0; 
+        let isAllViewMode = false; 
+        let editingItemId = null; 
+
+        function init() {
+            const local = localStorage.getItem('universal_travel_planner_v5');
+            if (local) { try { plannerData = JSON.parse(local); } catch(e) {} }
+            
+            document.getElementById('trip-title').value = plannerData.title || "";
+            document.getElementById('trip-start').value = plannerData.startDate || "";
+            document.getElementById('trip-end').value = plannerData.endDate || "";
+            document.getElementById('currency-name').value = plannerData.curName || "JPY";
+            document.getElementById('currency-rate').value = plannerData.curRate || 0.215;
+            
+            const memoEl = document.getElementById('memo-input');
+            memoEl.value = plannerData.memo || "";
+            
+            updateCurrencyLabels();
+            renderBudget();
+            renderChecklist();
+            refreshScheduleView();
+            
+            setTimeout(() => {
+                autoGrow(memoEl);
+                document.querySelectorAll('.textarea-name').forEach(el => autoGrow(el));
+            }, 100);
+        }
+
+        function autoGrow(element) {
+            element.style.height = "5px"; 
+            element.style.height = (element.scrollHeight) + "px"; 
+        }
+
+        function exportToPDF() {
+            const alreadyAllView = isAllViewMode;
+            if (!alreadyAllView) {
+                isAllViewMode = true;
+                const btn = document.getElementById('view-toggle-btn');
+                const sec = document.getElementById('sec-schedule');
+                btn.innerText = "📱 切換：分頁標籤模式";
+                sec.classList.add('view-all-mode');
+                refreshScheduleView();
+            }
+
+            setTimeout(() => {
+                window.print();
+                
+                if (!alreadyAllView) {
+                    isAllViewMode = false;
+                    const btn = document.getElementById('view-toggle-btn');
+                    const sec = document.getElementById('sec-schedule');
+                    btn.innerText = "👁️ 一鍵全覽(轉印PDF)模式";
+                    sec.classList.remove('view-all-mode');
+                    refreshScheduleView();
+                }
+            }, 300);
+        }
+
+        function saveData() {
+            plannerData.title = document.getElementById('trip-title').value;
+            plannerData.startDate = document.getElementById('trip-start').value;
+            plannerData.endDate = document.getElementById('trip-end').value;
+            plannerData.curName = document.getElementById('currency-name').value;
+            plannerData.curRate = parseFloat(document.getElementById('currency-rate').value) || 0;
+            plannerData.memo = document.getElementById('memo-input').value;
+            localStorage.setItem('universal_travel_planner_v5', JSON.stringify(plannerData));
+        }
+
+        function updateCurrencyLabels() {
+            const name = document.getElementById('currency-name').value || "外幣";
+            document.querySelectorAll('.lbl-cur-est').forEach(el => el.innerText = `預估(${name})`);
+            document.querySelectorAll('.lbl-cur-act').forEach(el => el.innerText = `實際(${name})`);
+            saveData();
+            calcBudget();
+        }
+
+        // --- 記帳運算 ---
+        function renderBudget() {
+            const tbody = document.getElementById('budget-tbody'); tbody.innerHTML = '';
+            plannerData.budget.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" class="input-category" value="${item.category}" onchange="updateBudgetValue(${idx}, 'category', this.value)"></td>
+                    <td>
+                        <textarea class="textarea-name" oninput="autoGrow(this)" onchange="updateBudgetValue(${idx}, 'name', this.value)">${item.name}</textarea>
+                    </td>
+                    <td><input type="number" class="input-amount" value="${item.estFC}" onchange="updateBudgetValue(${idx}, 'estFC', this.value)"></td>
+                    <td><input type="number" class="input-amount" value="${item.actFC}" onchange="updateBudgetValue(${idx}, 'actFC', this.value)"></td>
+                    <td><input type="number" class="input-amount" value="${item.actTWD}" onchange="updateBudgetValue(${idx}, 'actTWD', this.value)"></td>
+                    <td class="auto-twd-cell" style="padding-top:1.2rem; font-weight:500;">0</td>
+                    <td><button class="btn btn-d btn-sm" style="padding:0.3rem 0.5rem;" onclick="deleteBudgetItem(${idx})">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            setTimeout(() => {
+                document.querySelectorAll('.textarea-name').forEach(el => autoGrow(el));
+            }, 10);
+            
+            calcBudget();
+        }
+        function addBudgetItem() { plannerData.budget.push({ category: "餐飲", name: "全新記帳項目描述...", estFC: 0, actFC: 0, actTWD: 0 }); renderBudget(); }
+        function deleteBudgetItem(idx) { plannerData.budget.splice(idx, 1); renderBudget(); }
+        function updateBudgetValue(idx, field, val) {
+            if (['category', 'name'].includes(field)) plannerData.budget[idx][field] = val;
+            else plannerData.budget[idx][field] = parseFloat(val) || 0;
+            calcBudget();
+        }
+        function calcBudget() {
+            const rate = parseFloat(document.getElementById('currency-rate').value) || 0;
+            let tEstFC = 0, tActFC = 0, tActTWD = 0, tAutoTWD = 0;
+            const rows = document.querySelectorAll('#budget-tbody tr');
+            plannerData.budget.forEach((item, idx) => {
+                tEstFC += item.estFC; tActFC += item.actFC; tActTWD += item.actTWD;
+                let autoTWD = item.actTWD > 0 ? item.actTWD : (item.actFC > 0 ? Math.round(item.actFC * rate) : Math.round(item.estFC * rate));
+                tAutoTWD += autoTWD;
+                if (rows[idx]) rows[idx].querySelector('.auto-twd-cell').innerText = autoTWD.toLocaleString();
+            });
+            document.getElementById('total-est-fc').innerText = tEstFC.toLocaleString();
+            document.getElementById('total-act-fc').innerText = tActFC.toLocaleString();
+            document.getElementById('total-act-twd').innerText = tActTWD.toLocaleString();
+            document.getElementById('total-auto-twd').innerText = tAutoTWD.toLocaleString();
+            saveData();
+        }
+
+        // --- 行李點檢 ---
+        function renderChecklist() {
+            const grid = document.getElementById('pack-grid'); grid.innerHTML = '';
+            plannerData.checklist.forEach((item, idx) => {
+                const div = document.createElement('div'); div.className = 'check-item';
+                div.innerHTML = `
+                    <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleCheck(${idx})">
+                    <span style="${item.checked ? 'text-decoration: line-through; color: #b5838d;' : ''}">${item.name}</span>
+                    <span class="del-check" onclick="deletePackItem(${idx})">✕</span>
+                `;
+                grid.appendChild(div);
+            });
+        }
+        function addPackItem() {
+            const input = document.getElementById('new-pack-name'); if (!input.value.trim()) return;
+            plannerData.checklist.push({ name: input.value.trim(), checked: false }); input.value = '';
+            saveData(); renderChecklist();
+        }
+        function toggleCheck(idx) { plannerData.checklist[idx].checked = !plannerData.checklist[idx].checked; saveData(); renderChecklist(); }
+        function deletePackItem(idx) { plannerData.checklist.splice(idx, 1); saveData(); renderChecklist(); }
+
+        // --- 行程核心渲染 ---
+        function toggleViewMode() {
+            isAllViewMode = !isAllViewMode;
+            const btn = document.getElementById('view-toggle-btn');
+            const sec = document.getElementById('sec-schedule');
+            if (isAllViewMode) {
+                btn.innerText = "📱 切換：分頁標籤模式";
+                sec.classList.add('view-all-mode');
+            } else {
+                btn.innerText = "👁️ 一鍵全覽(轉印PDF)模式";
+                sec.classList.remove('view-all-mode');
+            }
+            refreshScheduleView();
+        }
+
+        function refreshScheduleView() {
+            renderTabs();
+            renderTimelineWrapper();
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('days-tabs-container'); container.innerHTML = '';
+            plannerData.days.forEach((day, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `tab-btn ${idx === currentDayIdx ? 'active' : ''}`;
+                btn.innerText = `Day ${day.dayNum}`;
+                btn.onclick = () => { currentDayIdx = idx; editingItemId = null; refreshScheduleView(); };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderTimelineWrapper() {
+            const wrapper = document.getElementById('schedule-wrapper-box');
+            wrapper.innerHTML = '';
+
+            if (isAllViewMode) {
+                plannerData.days.forEach((day, dIdx) => {
+                    wrapper.appendChild(createDayBlockHtml(day, dIdx));
+                });
+            } else {
+                const day = plannerData.days[currentDayIdx];
+                if (day) wrapper.appendChild(createDayBlockHtml(day, currentDayIdx));
+            }
+        }
+
+        function createDayBlockHtml(day, dIdx) {
+            const block = document.createElement('div');
+            block.className = 'print-day-block';
+            
+            const title = document.createElement('div');
+            title.className = 'print-day-title';
+            title.innerText = `📅 第 ${day.dayNum} 天 行程全覽`;
+            block.appendChild(title);
+
+            const timeline = document.createElement('div');
+            timeline.className = 'timeline';
+
+            if (day.items.length === 0) {
+                timeline.innerHTML = `<p style="color:#a15c68; font-size:0.9rem;">今天尚未排定行程。</p>`;
+            } else {
+                day.items.forEach((item, iIdx) => {
+                    const card = document.createElement('div');
+                    card.className = 'timeline-item';
+                    
+                    const currentId = `${dIdx}_${iIdx}`;
+
+                    if (editingItemId === currentId) {
+                        card.innerHTML = `
+                            <div style="font-weight: bold; color: var(--primary-dark); margin-bottom: 8px;">✏️ 正在修改此段行程</div>
+                            <div class="edit-inline-box">
+                                <div class="form-group"><label>開始時間</label><input type="time" id="edit-start" value="${item.timeStart}"></div>
+                                <div class="form-group"><label>結束時間</label><input type="time" id="edit-end" value="${item.timeEnd}"></div>
+                                <div class="form-group"><label>主題標籤</label><input type="text" id="edit-label" value="${item.label}"></div>
+                                <div class="form-group"><label>名稱/主旨</label><input type="text" id="edit-title" value="${item.title}"></div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 6px; margin-top:8px;">
+                                <div class="form-group"><label>參考網址</label><input type="text" id="edit-url" value="${item.url || ''}"></div>
+                                <div class="form-group"><label>備註內容</label><textarea id="edit-note" rows="2">${item.note || ''}</textarea></div>
+                            </div>
+                            <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: flex-end;">
+                                <button class="btn btn-s btn-sm" onclick="saveInlineEdit(${dIdx}, ${iIdx})">💾 儲存</button>
+                                <button class="btn btn-d btn-sm" onclick="cancelInlineEdit()">❌ 取消</button>
+                            </div>
+                        `;
+                    } else {
+                        card.innerHTML = `
+                            <div class="schedule-main">
+                                <span class="time-badge">⏰ ${item.timeStart || '00:00'} - ${item.timeEnd || '00:00'}</span>
+                                <span class="sub-topic">${item.label}</span>
+                                <span>${item.title}</span>
+                                <div style="margin-left:auto; display:flex; gap:5px;">
+                                    <button class="btn btn-s btn-sm" onclick="startInlineEdit(${dIdx}, ${iIdx})">✏️ 編輯</button>
+                                    <button class="btn btn-d btn-sm" onclick="deleteScheduleItem(${dIdx}, ${iIdx})">🗑️</button>
+                                </div>
+                            </div>
+                            ${item.note ? `<div class="sch-note">${item.note}</div>` : ''}
+                            ${item.url ? `<a href="${item.url}" target="_blank" style="font-size:0.8rem; color:var(--secondary-dark); text-decoration:none; display:inline-block; margin-top:5px;">🔗 參考連結/地圖指南</a>` : ''}
+                        `;
+                    }
+                    timeline.appendChild(card);
+                });
+            }
+            block.appendChild(timeline);
+            return block;
+        }
+
+        function startInlineEdit(dIdx, iIdx) {
+            editingItemId = `${dIdx}_${iIdx}`;
+            refreshScheduleView();
+        }
+
+        function cancelInlineEdit() {
+            editingItemId = null;
+            refreshScheduleView();
+        }
+
+        function saveInlineEdit(dIdx, iIdx) {
+            const timeStart = document.getElementById('edit-start').value;
+            const timeEnd = document.getElementById('edit-end').value;
+            const label = document.getElementById('edit-label').value.trim() || "景點";
+            const title = document.getElementById('edit-title').value.trim();
+            const url = document.getElementById('edit-url').value.trim();
+            const note = document.getElementById('edit-note').value.trim();
+
+            if (!title) { alert("項目名稱不能為空！"); return; }
+
+            plannerData.days[dIdx].items[iIdx] = { timeStart, timeEnd, label, title, url, note };
+            plannerData.days[dIdx].items.sort((a, b) => a.timeStart.localeCompare(b.timeStart));
+
+            editingItemId = null; 
+            saveData();
+            refreshScheduleView();
+        }
+
+        function addScheduleItem() {
+            const timeStart = document.getElementById('sch-time-start').value;
+            const timeEnd = document.getElementById('sch-time-end').value;
+            const label = document.getElementById('sch-label').value.trim() || "景點";
+            const title = document.getElementById('sch-title').value.trim();
+            const url = document.getElementById('sch-url').value.trim();
+            const note = document.getElementById('sch-note').value.trim();
+
+            if (!title) { alert("請填寫小主題/景點名稱！"); return; }
+
+            plannerData.days[currentDayIdx].items.push({ timeStart, timeEnd, label, title, url, note });
+            plannerData.days[currentDayIdx].items.sort((a, b) => a.timeStart.localeCompare(b.timeStart));
+
+            document.getElementById('sch-title').value = '';
+            document.getElementById('sch-url').value = '';
+            document.getElementById('sch-note').value = '';
+
+            saveData();
+            refreshScheduleView();
+        }
+
+        function deleteScheduleItem(dIdx, iIdx) {
+            if (confirm("確定要刪除這筆行程嗎？")) {
+                plannerData.days[dIdx].items.splice(iIdx, 1);
+                editingItemId = null;
+                saveData();
+                refreshScheduleView();
+            }
+        }
+
+        function addDayTab() {
+            plannerData.days.push({ dayNum: plannerData.days.length + 1, items: [] });
+            saveData(); refreshScheduleView();
+        }
+        function deleteDayTab() {
+            if (plannerData.days.length <= 1) return;
+            if (confirm("要刪除最後一天行程嗎？")) {
+                plannerData.days.pop();
+                if (currentDayIdx >= plannerData.days.length) currentDayIdx = plannerData.days.length - 1;
+                editingItemId = null;
+                saveData(); refreshScheduleView();
+            }
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(plannerData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `travel_planner_backup.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && parsed.days && parsed.budget) {
+                        if (confirm("成功讀取備份！是否覆蓋目前的旅遊看板資料？")) {
+                            plannerData = parsed;
+                            localStorage.setItem('universal_travel_planner_v5', JSON.stringify(plannerData));
+                            editingItemId = null;
+                            init();
+                        }
+                    } else { alert("資料格式不吻合，請確保這是由本系統導出的 JSON。"); }
+                } catch (err) { alert("檔案解析失敗！"); }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        init();
+    </script>
+</body>
+</html>
