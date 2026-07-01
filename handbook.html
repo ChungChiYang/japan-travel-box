@@ -212,86 +212,61 @@
             line-height: 1.6;
         }
 		
-/* ==================== 📱 隨身路書手機版 RWD 完美收納版 ==================== */
+/* ==================== 📱 隨身路書手機版 RWD 獨立分離最終版 ==================== */
         @media (max-width: 768px) {
-            /* --- ⚙️ 側選單/主容器 Flex 排序調整（關鍵：讓 navbar 自動掉到最底部） --- */
-            body {
-                display: flex !important;
-                flex-direction: column !important;
+            /* --- 🛡️ 拯救預算與物品點檢：還原預設排版，徹底拒絕擠成一團 --- */
+            body, .main-container, body > div {
+                display: block !important; /* 絕對不使用 flex，還原最安全的傳統區塊流 */
                 height: auto !important;
-                overflow-y: auto !important;
-            }
-            
-            /* 將路書的主容器設定為 flex 佈局，方便透過 order 調整元件上下順序 */
-            .main-container,
-            body > div:not(.navbar) {
-                display: flex !important;
-                flex-direction: column !important;
-                margin-top: 0 !important;
-                padding: 10px 8px !important;
+                overflow-y: visible !important;
+                padding: 10px 4px !important;
             }
 
-            /* --- 修正 2：把原本置頂的 .navbar 搖身一變，變成放在最底部的專用備份卡片 --- */
-            .navbar {
-                position: relative !important;
-                top: auto !important;
-                left: auto !important;
-                display: flex !important;
-                flex-direction: column !important; /* 按鈕群改為垂直排列 */
-                order: 99 !important; /* ⚡ 關鍵：強制把這一塊丟到網頁的最底部 */
-                background: #ffffff !important; /* 換成乾淨的白色背景 */
-                border: 2px dashed #ffb3c1 !important; /* 少女風的精緻虛線備份箱框線 */
+            /* --- 修正 2：電腦版頂部的 navbar 在手機上直接隱藏，防止卡在畫面一半 --- */
+            nav.navbar, .navbar {
+                display: none !important;
+            }
+
+            /* --- ⚙️ 讓新加的底部備份面板在手機上亮麗登場 --- */
+            .mobile-bottom-backup-box {
+                display: block !important; /* 手機版顯示 */
+                background: #ffffff !important;
+                border: 2px dashed #ffb3c1 !important; /* 粉嫩的虛線工具箱外觀 */
                 padding: 1.2rem 1rem !important;
-                margin: 2rem 8px 1rem 8px !important;
+                margin: 2.5rem 8px 1.5rem 8px !important;
                 border-radius: 14px !important;
-                width: calc(100% - 16px) !important;
                 box-sizing: border-box !important;
-                box-shadow: none !important;
-                height: auto !important;
             }
-
-            /* 重新微調手機版的最底部標題文字與樣式 */
-            .navbar h1 {
+            .mobile-bottom-backup-box h3 {
                 color: #ff758f !important;
-                font-size: 1.1rem !important;
+                font-size: 1.05rem !important;
                 margin: 0 0 1rem 0 !important;
                 text-align: center !important;
-                width: 100% !important;
             }
-            /* 讓標題在手機上自動加上前綴，看起來更像功能區 */
-            .navbar h1::before {
-                content: "⚙️ 手機版 " !important;
-            }
-
-            /* 讓包著按鈕的容器在最下方滿版撐開 */
-            .navbar .nav-links {
+            .mobile-action-links {
                 display: flex !important;
-                flex-direction: column !important; /* 按鈕改為上下堆疊，超好點選 */
-                width: 100% !important;
+                flex-direction: column !important; /* 按鈕垂直堆疊 */
                 gap: 10px !important;
-            }
-
-            /* 強制美化所有的 PDF、導出、導入按鈕，變成手機好按的大按鈕 */
-            .navbar .btn {
                 width: 100% !important;
-                max-width: 100% !important;
-                box-sizing: border-box !important;
+            }
+            /* 手機版大按鈕美化，極好點擊 */
+            .mobile-bottom-backup-box .btn {
+                width: 100% !important;
                 padding: 12px !important;
                 font-size: 0.95rem !important;
                 display: flex !important;
                 justify-content: center !important;
                 align-items: center !important;
-                margin: 0 !important;
                 border-radius: 8px !important;
-                height: auto !important;
+                box-sizing: border-box !important;
+                margin: 0 !important;
+            }
+            /* 徹底消滅原生 file 破圖按鈕 */
+            .mobile-bottom-backup-box input[type="file"] {
+                display: none !important;
             }
 
-            /* 🎯 徹底消滅「導入」旁邊那個破圖、刺穿出來的原生醜按鈕 */
-            .navbar input[type="file"] {
-                display: none !important; 
-            }
-
-            /* --- 修正 1：每日行程的各個填寫欄位滿版、上下對齊美化 --- */
+            /* --- 修正 1：僅限「插入行程表單」垂直對齊，絕不外溢干擾預算與物品 --- */
             .add-sch-box div[style*="display"],
             .add-sch-box .info-grid,
             .edit-inline-box {
@@ -300,20 +275,20 @@
                 gap: 12px !important;
                 width: 100% !important;
             }
-            .form-group {
+            .add-sch-box .form-group {
                 width: 100% !important;
-                max-width: 100% !important;
                 box-sizing: border-box !important;
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 4px !important;
             }
-            input, select, textarea, input[type="text"], input[type="time"], .textarea-name, .memo-area {
+            /* 讓時間、大主題、小主題等輸入框精緻滿版 */
+            .add-sch-box input, .add-sch-box select, .add-sch-box textarea,
+            input[type="text"], input[type="time"] {
                 width: 100% !important;
                 max-width: 100% !important;
                 min-width: 0 !important;
                 box-sizing: border-box !important;
-                display: block !important;
                 padding: 10px !important;
                 font-size: 0.95rem !important;
                 border-radius: 8px !important;
@@ -322,7 +297,7 @@
             textarea { height: 70px !important; resize: none; }
             .section-card { padding: 1.2rem 1rem !important; margin-bottom: 1.5rem !important; border-radius: 14px !important; }
 
-            /* --- 天數選單橫向流暢滾動保持 --- */
+            /* --- 天數標籤橫向流暢滾動保持 --- */
             .days-tabs {
                 display: flex !important;
                 flex-wrap: nowrap !important;
@@ -336,6 +311,13 @@
             /* 功能按鈕區（一鍵全覽、增減天數）垂直滿版堆疊 */
             .section-card > div[style*="display: flex"] { flex-direction: column !important; gap: 8px !important; }
             .section-card > div[style*="display: flex"] button, .section-card > div[style*="display: flex"] a { width: 100% !important; justify-content: center !important; }
+        }
+
+        /* 💻 電護版預設隱藏手機底部面板 */
+        @media (min-width: 769px) {
+            .mobile-bottom-backup-box {
+                display: none !important;
+            }
         }
 		
 		
@@ -424,7 +406,7 @@
 <body>
 
     <!-- 頂部導覽列 -->
-    <nav class="navbar">
+<nav class="navbar">
         <h1>🌸 自由行計畫  </h1>
         <div class="nav-links">
             <button class="btn btn-pdf btn-sm" onclick="exportToPDF()">🖨️ PDF</button>
@@ -433,6 +415,16 @@
             <input type="file" id="importInput" accept=".json" onchange="importJSON(event)">
         </div>
     </nav>
+
+    <div class="mobile-bottom-backup-box">
+        <h3>⚙️ 手機版檔案備份與導入</h3>
+        <div class="mobile-action-links">
+            <button class="btn btn-pdf" onclick="exportToPDF()">🖨️ 匯出 PDF</button>
+            <button class="btn btn-s" onclick="exportJSON()">📤 導出 JSON 備份</button>
+            <button class="btn btn-s" onclick="document.getElementById('mobileImportInput').click()">📥 導入 JSON 進度</button>
+            <input type="file" id="mobileImportInput" accept=".json" onchange="importJSON(event)">
+        </div>
+    </div>
 
     <div class="main-container">
 
