@@ -210,6 +210,36 @@
             border: 1px solid #eccacc; 
             line-height: 1.6;
         }
+		
+/* ==================== 📱 僅針對時間欄位的手機版精確修正 ==================== */
+        @media (max-width: 768px) {
+            /* 🎯 精確指定：只有在「插入行程區」裡面的時間群組，才在手機上改成垂直排列 */
+            /* 這樣做絕對不會牽連到下方的記帳、行李或任何格子的排版 */
+            .add-sch-box div[style*="display: grid"],
+            .add-sch-box div[style*="display: flex"],
+            .add-sch-box .info-grid {
+                display: flex !important;
+                flex-direction: column !important; /* 電腦版原本是並排，手機版強制拆成上下兩行 */
+                gap: 10px !important;
+            }
+
+            .add-sch-box .form-group {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* 強制重塑 iOS Safari 的時間選擇器，徹底剝奪它的任性寬度 */
+            .add-sch-box input[type="time"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important; /* 破除 iOS 內建最小寬度的物理限制 */
+                box-sizing: border-box !important;
+                display: block !important;
+                -webkit-appearance: listbox !important; /* 強制 iOS 使用標準文字框盒模型 */
+                padding: 0.6rem !important;
+            }
+        }
 
 		
         #importInput { display: none; }
