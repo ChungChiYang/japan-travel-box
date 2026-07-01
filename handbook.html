@@ -210,7 +210,87 @@
             border: 1px solid #eccacc; 
             line-height: 1.6;
         }
+/* ==================== 📱 隨身路書手機版 RWD 表單防破圖升級 ==================== */
+        @media (max-width: 768px) {
+            /* 1. 將新增行程區塊內原本並排的欄位一律改為垂直堆疊 */
+            .add-sch-box div[style*="display: grid"],
+            .add-sch-box div[style*="grid-template-columns"],
+            .add-sch-box div[style*="display: flex"] {
+                grid-template-columns: 1fr !important; /* 轉為單一欄位 */
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
 
+            /* 2. 強制表單內部所有欄位、下拉選單、文字域寬度 100% 收進螢幕內 */
+            .add-sch-box input,
+            .add-sch-box select,
+            .add-sch-box textarea,
+            .edit-inline-box input,
+            .edit-inline-box select,
+            .edit-inline-box textarea {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                min-width: 0 !important; /* 消除內建的 min-width 撐破限制 */
+            }
+
+            /* 3. 調整插入行程的大按鈕與上方的天數刪減控制按鈕，避免擠壓 */
+            .add-sch-box button,
+            .section-title div[style*="display:flex"] {
+                width: 100% !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+
+            /* 4. 修正天數管理按鈕（增天數/減天數）在手機標題區的並排寬度 */
+            .section-title {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px !important;
+            }
+
+            .section-title div {
+                width: 100% !important;
+                justify-content: flex-start !important;
+            }
+
+            /* 5. 縮小手機版記帳表格與內容的 Padding，爭取更多閱讀空間 */
+            th, td {
+                padding: 0.5rem 0.3rem !important;
+                font-size: 0.82rem !important;
+            }
+
+            .textarea-name {
+                min-width: 140px !important; /* 縮小手機版記帳品項寬度，減少往右滑的幅度 */
+            }
+
+            .input-amount {
+                width: 75px !important; /* 縮小輸入框寬度適應小螢幕 */
+            }
+            .input-category {
+                width: 65px !important;
+            }
+
+            /* 6. 行程表單內容微調：時間與標籤並排優化 */
+            .schedule-main {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 6px !important;
+            }
+            
+            .schedule-main div[style*="margin-left:auto"] {
+                margin-left: 0 !important;
+                width: 100% !important;
+                display: flex !important;
+                gap: 8px !important;
+                margin-top: 5px !important;
+            }
+            
+            .schedule-main div[style*="margin-left:auto"] button {
+                flex: 1 !important; /* 讓編輯、刪除按鈕在手機上各佔一半，更好點擊 */
+            }
+        }
         #importInput { display: none; }
 
         /* ==================== 🖨️ PDF / 列印專用防分割與寬度重配語法 ==================== */
