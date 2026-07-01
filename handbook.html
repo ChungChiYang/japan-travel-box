@@ -210,62 +210,37 @@
             border: 1px solid #eccacc; 
             line-height: 1.6;
         }
-/* ==================== 📱 隨身路書手機版 RWD 最終完美修正版 ==================== */
+/* ==================== 📱 隨身路書手機版 RWD 徹底解放版 ==================== */
         @media (max-width: 768px) {
-            /* --- 痛點 1 修正：強力解除粉藍漸層 header 的固定狀態，讓它絕對能隨網頁滾動滑走 --- */
-            /* 針對路書內所有可能寫了固定定位的頂部區塊，全部強制改為跟隨捲軸 */
+            /* --- 修正 1：徹底解放頂部橫條！讓它隨網頁滾動「直接滑走消失」 --- */
             header,
             .navbar,
-            div[style*="position: sticky"],
-            div[style*="position: fixed"],
-            div[style*="-webkit-sticky"] {
-                position: relative !important; 
+            div[style*="background: linear-gradient"],
+            div[style*="#ff758f"] {
+                position: relative !important; /* 破除 sticky 和 fixed，變回普通元素 */
                 top: auto !important;
-                background: linear-gradient(135deg, #ff758f, #a2d2ff) !important;
-                padding: 1rem !important; /* 縮減內距釋放空間 */
-                margin-bottom: 1rem !important;
-            }
-            
-            /* 如果那個粉藍漸層的大標題是用特定高度撐開的，強制自適應 */
-            div[style*="height"] {
-                height: auto !important;
-            }
-
-            /* --- 痛點 3 修正：解決時間欄位（開始/結束時間）凸出外框的問題 --- */
-            /* 針對時間選擇器進行盒模型重塑，並消除 iOS Safari 的預設外觀 */
-            input[type="time"],
-            input[type="date"] {
+                left: auto !important;
                 width: 100% !important;
-                max-width: 100% !important;
+                height: auto !important;
+                z-index: 1 !important;
+                padding: 1rem !important; /* 大幅縮小內距，點開時也不要太大塊 */
                 box-sizing: border-box !important;
-                -webkit-appearance: none !important; /* 消除 iOS 內建樣式干擾 */
-                padding: 0.5rem !important; /* 稍微縮小內距，防止撐破 */
-                min-width: 0 !important;
             }
 
-            /* --- 天數標籤維持流暢左右滑動 --- */
-            .days-tabs {
-                display: flex !important;
-                flex-wrap: nowrap !important;
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch !important;
-                padding-bottom: 8px !important;
-                border-bottom: 1px solid #ffe5ec;
-            }
-            .tab-btn {
-                flex: 0 0 auto !important;
-                padding: 0.4rem 1rem !important;
+            /* 確保下方內容不要有奇怪的間距 */
+            .main-container, 
+            body > div:not(.navbar):not(header) {
+                margin-top: 0 !important;
+                padding: 0 8px !important;
             }
 
-            /* --- 欄位與按鈕全面防破圖直立堆疊 --- */
-            .info-grid,
+            /* --- 修正 3：徹底解決「開始時間 / 結束時間」凸出外框的問題 --- */
+            /* 手機版強制將時間欄位拆成上下兩行獨立佔滿，不讓它們橫向擠壓 */
             .add-sch-box div[style*="display: grid"],
-            .add-sch-box div[style*="grid-template-columns"],
             .add-sch-box div[style*="display: flex"],
-            .edit-inline-box {
-                grid-template-columns: 1fr !important;
+            .info-grid {
                 display: flex !important;
-                flex-direction: column !important;
+                flex-direction: column !important; /* 改為垂直排列 */
                 gap: 12px !important;
             }
 
@@ -275,40 +250,43 @@
                 box-sizing: border-box !important;
             }
 
-            input, select, textarea,
-            input[type="text"],
-            .textarea-name,
-            .memo-area {
+            /* 沒收 iOS Safari 對 time 欄位的任性寬度，強制收乾邊距 */
+            input[type="time"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important; /* 破除 iOS 內建最小寬度限制 */
+                box-sizing: border-box !important;
+                display: block !important;
+                -webkit-appearance: listbox !important; /* 強制重塑 iOS 盒模型 */
+                padding: 0.6rem !important;
+            }
+
+            /* --- 天數標籤橫向滑動保持 --- */
+            .days-tabs {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding-bottom: 8px !important;
+                margin-top: 10px !important;
+            }
+            .tab-btn { flex: 0 0 auto !important; padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+
+            /* --- 其他表單欄位全面防爆防破圖 --- */
+            input, select, textarea, input[type="text"], .textarea-name, .memo-area {
                 width: 100% !important;
                 max-width: 100% !important;
                 min-width: 0 !important;
                 box-sizing: border-box !important;
-                display: block !important;
             }
+            textarea { height: 60px !important; resize: none; }
+            .section-card { padding: 1rem !important; margin-bottom: 1.5rem !important; }
 
-            textarea {
-                height: 60px !important;
-                resize: none;
-            }
-
-            .section-card {
-                padding: 1rem !important;
-                margin-bottom: 1.5rem !important;
-                border-radius: 12px !important;
-            }
-
-            /* 一鍵全覽、增減天數按鈕在手機上垂直排列 */
-            .section-card > div[style*="display: flex"] {
-                flex-direction: column !important;
-                gap: 8px !important;
-            }
+            /* 功能按鈕區（一鍵全覽、增減天數）垂直滿版堆疊 */
+            .section-card > div[style*="display: flex"] { flex-direction: column !important; gap: 8px !important; }
             .section-card > div[style*="display: flex"] button,
-            .section-card > div[style*="display: flex"] a {
-                width: 100% !important;
-                justify-content: center !important;
-            }
+            .section-card > div[style*="display: flex"] a { width: 100% !important; justify-content: center !important; }
         }
-
 		
         #importInput { display: none; }
 
