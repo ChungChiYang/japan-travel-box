@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🇯🇵 日本自由行 - 全功能旅遊工具箱</title>
     <style>
         :root {
@@ -23,7 +23,7 @@
             overflow: hidden;
         }
 
-        /* ==================== 🗺️ 左側導覽列 (Sidebar) ==================== */
+        /* ==================== 🗺️ 左側導覽列 ==================== */
         .sidebar {
             width: var(--sidebar-width);
             background-color: #1d3557;
@@ -32,130 +32,106 @@
             flex-direction: column;
             box-shadow: 4px 0 10px rgba(0,0,0,0.1);
             z-index: 10;
+            transition: all 0.3s ease;
         }
 
-        .sidebar-header {
-            padding: 1.5rem 1rem;
-            background: linear-gradient(135deg, var(--primary-color), #ff7096);
-            text-align: center;
-        }
-        .sidebar-header h2 { margin: 0; font-size: 1.3rem; letter-spacing: 1px; }
+        .sidebar-header { padding: 1.5rem 1rem; background: linear-gradient(135deg, var(--primary-color), #ff7096); text-align: center; }
+        .sidebar-header h2 { margin: 0; font-size: 1.3rem; }
         .sidebar-header p { margin: 0.3rem 0 0 0; font-size: 0.75rem; opacity: 0.8; }
 
-        .menu-list {
-            list-style: none;
-            padding: 1rem 0;
-            margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
+        .menu-list { list-style: none; padding: 1rem 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 1rem 1.5rem; color: #f1f3f5; text-decoration: none; cursor: pointer; transition: all 0.2s; border-left: 4px solid transparent; }
+        .menu-item:hover { background-color: #457b9d; }
+        .menu-item.active { background: rgba(255, 255, 255, 0.1); border-left-color: var(--primary-color); }
+        .menu-divider { padding: 0.5rem 1.5rem; font-size: 0.75rem; color: #a8dadc; }
+        .menu-item.disabled { opacity: 0.4; cursor: not-allowed; }
+        .sidebar-footer { padding: 1rem; font-size: 0.75rem; text-align: center; color: #a8dadc; border-top: 1px solid rgba(255,255,255,0.1); }
 
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 1rem 1.5rem;
-            color: #f1f3f5;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-            border-left: 4px solid transparent;
-        }
-        .menu-item:hover {
-            background-color: #457b9d;
+        /* 📱 手機專用漢堡選單按鈕 (電腦版隱藏) */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
             color: white;
-        }
-        .menu-item.active {
-            background-color: #1d3557;
-            background: rgba(255, 255, 255, 0.1);
-            border-left-color: var(--primary-color);
-            color: white;
-        }
-
-        .menu-divider {
-            padding: 0.5rem 1.5rem;
-            font-size: 0.75rem;
-            color: #a8dadc;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 1rem;
-        }
-
-        .menu-item.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .menu-item.disabled:hover { background: transparent; }
-
-        .sidebar-footer {
-            padding: 1rem;
-            font-size: 0.75rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
             text-align: center;
-            color: #a8dadc;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            line-height: 56px;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 99999;
+            cursor: pointer;
         }
 
-        /* ==================== 💻 右側主內容區 (Iframe 載入器) ==================== */
+        /* ==================== 💻 右側主內容區 ==================== */
         .main-container {
             flex-grow: 1;
             height: 100vh;
             border: none;
             background-color: var(--bg-color);
+            position: relative;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* 讓 iframe 漂亮鋪滿右側 */
         #tool-runner {
             width: 100%;
             height: 100%;
             border: none;
-            background-color: transparent;
+            display: block;
         }
-        /* 📱 當螢幕寬度小於 768px（手機/直向平板）時的修正 */
+
+        /* ==================== 📱 手機版 RWD 強制突變設定 ==================== */
         @media (max-width: 768px) {
             body {
-                flex-direction: column; /* 讓本來的左右排列，變成上下排列 */
+                flex-direction: column;
             }
 
+            /* 1. 把礙事的側邊欄直接做成手機側滑抽屜（預案隱藏） */
             .sidebar {
-                width: 100%; /* 側邊欄寬度變滿版 */
-                height: auto; /* 高度自動 */
+                position: fixed;
+                left: -260px;
+                top: 0;
+                height: 100vh;
+                z-index: 99998;
+                width: 260px;
+            }
+            .sidebar.open {
+                left: 0;
             }
 
-            .menu-list {
-                display: flex; /* 讓選單項目從上下排，變成橫向左右排 */
-                overflow-x: auto; /* 超出螢幕時可以左右滑動 */
-                padding: 0.5rem;
+            /* 2. 顯示浮動切換鈕 */
+            .menu-toggle {
+                display: block;
             }
 
-            .menu-item {
-                padding: 0.5rem 1rem;
-                white-space: nowrap; /* 字體不換行 */
-                border-left: none;
-                border-bottom: 3px solid transparent; /* 把左邊條改成底邊條 */
-            }
-
-            .menu-item.active {
-                border-left-color: transparent;
-                border-bottom-color: var(--primary-color);
-            }
-
-            .menu-divider, .sidebar-footer {
-                display: none; /* 在手機版隱藏不必要的文字分隔線與頁尾 */
-            }
-
+            /* 3. 徹底解放右側 iframe 容器，給它 100% 的乾淨寬度 */
             .main-container {
-                height: calc(100vh - 120px); /* 扣除上方選單後的高度，讓 iframe 滿版 */
+                width: 100vw !important;
+                max-width: 100vw !important;
+                height: 100vh !important;
+                overflow-x: hidden;
+            }
+            
+            /* 強制限制 iframe 視窗範圍，逼迫內部 HTML 認清手機寬度 */
+            #tool-runner {
+                width: 100% !important;
+                min-width: 100% !important;
+                height: 100% !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <div class="menu-toggle" onclick="toggleSidebar()">🛠️</div>
+
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2>🧳 智慧旅遊盒子</h2>
-            <p>Version 2.5 (模組化分開版)</p>
+            <p>Version 2.6 (手機完美優化版)</p>
         </div>
         <ul class="menu-list">
             <div class="menu-divider">目前工具</div>
@@ -165,17 +141,9 @@
             <li class="menu-item" onclick="loadTool('handbook.html', this)">
                 <span>📖</span> 隨身路書與點檢表
             </li>
-
-            <div class="menu-divider">未來擴充預留</div>
-            <li class="menu-item disabled">
-                <span>💰</span> 旅遊記帳與分帳
-            </li>
-            <li class="menu-item disabled">
-                <span>💹</span> 即時日幣匯率助手
-            </li>
         </ul>
         <div class="sidebar-footer">
-            各工具獨立儲存於瀏覽器<br>換設備請記得於各工具內導出
+            各工具獨立儲存於瀏覽器<br>點右下角按鈕可切換工具
         </div>
     </div>
 
@@ -184,15 +152,22 @@
     </div>
 
     <script>
-        function loadTool(fileName, menuItem) {
-            // 1. 改變 iframe 的來源檔案網址
-            document.getElementById('tool-runner').src = fileName;
+        // 切換側邊欄顯示狀態（手機版專用）
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
 
-            // 2. 切換左側按鈕高亮狀態
+        function loadTool(fileName, menuItem) {
+            document.getElementById('tool-runner').src = './' + fileName;
+
+            // 關閉高亮
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
             });
             menuItem.classList.add('active');
+
+            // 如果在手機版，選完工具後自動把側邊欄抽屜收回去
+            document.getElementById('sidebar').classList.remove('open');
         }
     </script>
 </body>
