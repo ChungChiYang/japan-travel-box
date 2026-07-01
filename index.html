@@ -112,42 +112,42 @@
             background-color: transparent;
         }
         /* 📱 當螢幕寬度小於 768px（手機/直向平板）時的修正 */
-    @media (max-width: 768px) {
-        body {
-            flex-direction: column; /* 讓本來的左右排列，變成上下排列 */
-        }
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column; /* 讓本來的左右排列，變成上下排列 */
+            }
 
-        .sidebar {
-            width: 100%; /* 側邊欄寬度變滿版 */
-            height: auto; /* 高度自動 */
-        }
+            .sidebar {
+                width: 100%; /* 側邊欄寬度變滿版 */
+                height: auto; /* 高度自動 */
+            }
 
-        .menu-list {
-            display: flex; /* 讓選單項目從上下排，變成橫向左右排 */
-            overflow-x: auto; /* 超出螢幕時可以左右滑動 */
-            padding: 0.5rem;
-        }
+            .menu-list {
+                display: flex; /* 讓選單項目從上下排，變成橫向左右排 */
+                overflow-x: auto; /* 超出螢幕時可以左右滑動 */
+                padding: 0.5rem;
+            }
 
-        .menu-item {
-            padding: 0.5rem 1rem;
-            white-space: nowrap; /* 字體不換行 */
-            border-left: none;
-            border-bottom: 3px solid transparent; /* 把左邊條改成底邊條 */
-        }
+            .menu-item {
+                padding: 0.5rem 1rem;
+                white-space: nowrap; /* 字體不換行 */
+                border-left: none;
+                border-bottom: 3px solid transparent; /* 把左邊條改成底邊條 */
+            }
 
-        .menu-item.active {
-            border-left-color: transparent;
-            border-bottom-color: var(--primary-color);
-        }
+            .menu-item.active {
+                border-left-color: transparent;
+                border-bottom-color: var(--primary-color);
+            }
 
-        .menu-divider, .sidebar-footer {
-            display: none; /* 在手機版隱藏不必要的文字分隔線與頁尾 */
-        }
+            .menu-divider, .sidebar-footer {
+                display: none; /* 在手機版隱藏不必要的文字分隔線與頁尾 */
+            }
 
-        .main-container {
-            height: calc(100vh - 120px); /* 扣除上方選單後的高度，讓 iframe 滿版 */
+            .main-container {
+                height: calc(100vh - 120px); /* 扣除上方選單後的高度，讓 iframe 滿版 */
+            }
         }
-    }
     </style>
 </head>
 <body>
