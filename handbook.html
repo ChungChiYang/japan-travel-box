@@ -328,11 +328,11 @@
 
     <!-- 頂部導覽列 -->
     <nav class="navbar">
-        <h1>🌸 Alex 的萬用自由行隨身路書</h1>
+        <h1>🌸 自由行隨身路書</h1>
         <div class="nav-links">
-            <button class="btn btn-pdf btn-sm" onclick="exportToPDF()">🖨️ 一鍵匯出 PDF</button>
-            <button class="btn btn-s btn-sm" onclick="exportJSON()">📤 導出 JSON</button>
-            <button class="btn btn-s btn-sm" onclick="document.getElementById('importInput').click()">📥 導入 JSON</button>
+            <button class="btn btn-pdf btn-sm" onclick="exportToPDF()">🖨️ PDF</button>
+            <button class="btn btn-s btn-sm" onclick="exportJSON()">📤 導出</button>
+            <button class="btn btn-s btn-sm" onclick="document.getElementById('importInput').click()">📥 導入</button>
             <input type="file" id="importInput" accept=".json" onchange="importJSON(event)">
         </div>
     </nav>
@@ -388,7 +388,7 @@
         <!-- 3. 行李與重要物品點檢 -->
         <section id="sec-pack" class="section-card">
             <div class="section-title">
-                <span>3. 行李與重要物品點檢</span>
+                <span>3. 物品點檢</span>
                 <div style="display:flex; gap:5px;">
                     <input type="text" id="new-pack-name" placeholder="快速補件..." style="padding:0.2rem 0.5rem; font-size:0.85rem; width:120px;">
                     <button class="btn btn-p btn-sm" onclick="addPackItem()">➕ 新增</button>
@@ -400,7 +400,7 @@
         <!-- 4. 每日行程與地圖導航 -->
         <section id="sec-schedule" class="section-card">
             <div class="section-title">
-                <span>4. 每日行程與地圖導航</span>
+                <span>4. 每日行程</span>
                 <div style="display:flex; gap:8px;">
                     <button class="btn btn-s btn-sm" id="view-toggle-btn" onclick="toggleViewMode()">👁️ 一鍵全覽(轉印PDF)模式</button>
                     <button class="btn btn-p btn-sm" onclick="addDayTab()">➕ 增天數</button>
@@ -616,7 +616,7 @@
                 btn.innerText = "📱 切換：分頁標籤模式";
                 sec.classList.add('view-all-mode');
             } else {
-                btn.innerText = "👁️ 一鍵全覽(轉印PDF)模式";
+                btn.innerText = "👁️ 一鍵全覽";
                 sec.classList.remove('view-all-mode');
             }
             refreshScheduleView();
