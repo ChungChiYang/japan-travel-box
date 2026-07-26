@@ -152,23 +152,44 @@
     </div>
 
     <script>
-        // 切換側邊欄顯示狀態（手機版專用）
+        // 1. 切換手機版側邊欄抽屜
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
         }
 
-        function loadTool(fileName, menuItem) {
-            document.getElementById('tool-runner').src = './' + fileName;
+        // 2. 核心切換分頁邏輯 (防呆修復版)
+        function loadTool(fileName, element) {
+            const iframe = document.getElementById('tool-runner');
+            
+            // 🎯 防呆 1：如果點擊的是已經啟用的分頁，且頁面沒出錯，就只收起選單不重複載入
+            if (element.classList.contains('active') && iframe.src.includes(fileName)) {
+                document.getElementById('sidebar').classList.remove('open');
+                return;
+            }
 
-            // 關閉高亮
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            menuItem.classList.add('active');
+            // 🎯 防呆 2：正確切換 iframe 網址
+            iframe.src = './' + fileName;
 
-            // 如果在手機版，選完工具後自動把側邊欄抽屜收回去
+            // 🎯 防呆 3：徹底清除所有選單的高亮，只給當前點擊的項目加上 active
+            const allMenuItems = document.querySelectorAll('.menu-item');
+            allMenuItems.forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+
+            // 🎯 防呆 4：解決「切換沒反應/不跳畫面」！強制將主容器與 iframe 內部捲軸拉回最頂端
+            window.scrollTo(0, 0);
+            const mainContainer = document.querySelector('.main-container');
+            if (mainContainer) mainContainer.scrollTop = 0;
+
+            // 🎯 防呆 5：手機版點選後，自動收回左側抽屜
             document.getElementById('sidebar').classList.remove('open');
         }
+
+        // 🎯 3. 網頁首次初始化：確保重新整理時，預設的高亮標籤跟載入的 iframe 100% 一致
+        window.addEventListener('DOMContentLoaded', () => {
+            const iframe = document.getElementById('tool-runner');
+            // 預設載入 database.html (自由行情報資料庫)
+            iframe.src = './database.html';
+        });
     </script>
 </body>
 </html>
