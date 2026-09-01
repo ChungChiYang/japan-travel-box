@@ -1,10 +1,11 @@
-const CACHE_NAME = 'japan-travel-v1';
+const CACHE_NAME = 'japan-travel-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './handbook.html',
   './database.html',
   './communication.html'
+  './calculator.html' //
 ];
 
 // 安裝 Service Worker 並快取所有頁面
