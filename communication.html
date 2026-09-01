@@ -23,9 +23,7 @@
             padding-bottom: 60px;
         }
 
-        .header {
-            margin-bottom: 12px;
-        }
+        .header { margin-bottom: 12px; }
         .header h2 {
             margin: 0 0 4px 0;
             color: var(--secondary-color);
@@ -34,11 +32,7 @@
             align-items: center;
             gap: 8px;
         }
-        .header p {
-            margin: 0;
-            font-size: 0.82rem;
-            color: #6c757d;
-        }
+        .header p { margin: 0; font-size: 0.82rem; color: #6c757d; }
 
         /* 搜尋與分類 Tag */
         .search-box {
@@ -123,10 +117,7 @@
             color: #495057;
             margin-bottom: 12px;
         }
-        .card-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .card-actions { display: flex; gap: 8px; }
         .action-btn {
             flex: 1;
             padding: 8px 12px;
@@ -146,7 +137,7 @@
         .btn-show { background: #ffe5e5; color: var(--primary-color); }
         .btn-show:active { background: #fca5a5; }
 
-        /* 🎯 精緻化亮牌對話框 (Centered Pop-up Modal) */
+        /* 亮牌對話框 Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -199,16 +190,8 @@
             word-break: break-word;
         }
 
-        .modal-zh {
-            font-size: 16px;
-            color: #6b7280;
-            margin-bottom: 24px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-        }
+        .modal-zh { font-size: 16px; color: #6b7280; margin-bottom: 24px; }
+        .modal-actions { display: flex; gap: 10px; }
         .modal-btn {
             flex: 1;
             padding: 12px;
@@ -229,20 +212,22 @@
         <p>點選「亮牌」可彈出卡片直接秀給店員看</p>
     </div>
 
-    <input type="text" id="searchInput" class="search-box" placeholder="搜尋中文 / 日文 / 拼音 (例: 塑膠袋, 退稅)..." oninput="filterCards()">
+    <input type="text" id="searchInput" class="search-box" placeholder="搜尋關鍵字 (例: 菜單, 刷卡, 廁所, 微波)..." oninput="filterCards()">
 
     <div class="tags-container" id="tagsContainer">
         <button class="tag-btn active" onclick="filterTag('全部', this)">全部</button>
+        <button class="tag-btn" onclick="filterTag('常用語/問候', this)">👋 常用/問候</button>
         <button class="tag-btn" onclick="filterTag('結帳/超商', this)">🏪 結帳/超商</button>
         <button class="tag-btn" onclick="filterTag('支付/結帳', this)">💳 支付/結帳</button>
         <button class="tag-btn" onclick="filterTag('退稅/購物', this)">🛍️ 退稅/購物</button>
         <button class="tag-btn" onclick="filterTag('餐廳/點餐', this)">🍜 餐廳/點餐</button>
+        <button class="tag-btn" onclick="filterTag('觀光/問路', this)">📸 觀光/問路</button>
         <button class="tag-btn" onclick="filterTag('飯店/交通', this)">🏨 飯店/交通</button>
     </div>
 
     <div class="card-grid" id="cardGrid"></div>
 
-    <!-- 🎯 改善後的彈窗 Modal -->
+    <!-- 亮牌 Modal -->
     <div class="modal-overlay" id="showModal" onclick="bgCloseModal(event)">
         <div class="modal-box">
             <div class="modal-badge">店員さんへ (請看這裡)</div>
@@ -257,44 +242,77 @@
 
     <script>
         const cardData = [
+            // 👋 常用語/問候
+            { category: "常用語/問候", jp: "おはようございます。", roma: "Ohayou gozaimasu.", zh: "早安" },
+            { category: "常用語/問候", jp: "こんにちは。", roma: "Konnichiwa.", zh: "午安 / 你好" },
+            { category: "常用語/問候", jp: "こんばんは。", roma: "Kombanwa.", zh: "晚安" },
+            { category: "常用語/問候", jp: "ありがとうございます。", roma: "Arigatou gozaimasu.", zh: "非常感謝" },
+            { category: "常用語/問候", jp: "すみません。", roma: "Sumimasen.", zh: "不好意思 / 請問..." },
+            { category: "常用語/問候", jp: "失礼します。", roma: "Shitsurei shimasu.", zh: "失禮了 / 打擾了" },
+            { category: "常用語/問候", jp: "わかりません。", roma: "Wakarimasen.", zh: "我聽不懂 / 我不明白" },
+            { category: "常用語/問候", jp: "大丈夫です。", roma: "Daijoubu desu.", zh: "沒關係 / 不用了" },
+
             // 🏪 結帳/超商
             { category: "結帳/超商", jp: "袋はいりません。", roma: "Fukuro wa irimasen.", zh: "不用塑膠袋" },
             { category: "結帳/超商", jp: "袋を1枚お願いします。", roma: "Fukuro wo ichimai onegaishimasu.", zh: "請給我一個塑膠袋" },
             { category: "結帳/超商", jp: "温めてください。", roma: "Atatame te kudasai.", zh: "請幫我微波加熱" },
-            { category: "結帳/超商", jp: "お箸 / スプーンをください。", roma: "Ohashi / Supuun wo kudasai.", zh: "請給我筷子 / 湯匙" },
             { category: "結帳/超商", jp: "分け袋をお願いします。", roma: "Wake fukuro wo onegaishimasu.", zh: "請幫我分開裝袋" },
-            { category: "結帳/超商", jp: "レシートをください。", roma: "Reshiito wo kudasai.", zh: "請給我收據" },
 
             // 💳 支付/結帳
+            { category: "支付/結帳", jp: "お会計をお願いします。", roma: "Okaikei wo onegaishimasu.", zh: "我要結帳" },
+            { category: "支付/結帳", jp: "ごちそうさまでした。", roma: "Gochisousama deshita.", zh: "多謝款待（吃飽結帳時說）" },
+            { category: "支付/結帳", jp: "勘定を別々にしてください。", roma: "Kanjou wo betsubetsu ni shite kudasai.", zh: "請分開結帳" },
+            { category: "支付/結帳", jp: "領収書をもらえますか？", roma: "Ryoushushu wo moraemasu ka?", zh: "可以給我收據 / 發票嗎？" },
             { category: "支付/結帳", jp: "タッチ決済でお願いします。", roma: "Touch kessai de onegaishimasu.", zh: "使用信用卡感應支付 (Apple Pay)" },
             { category: "支付/結帳", jp: "交通系ICで払います。", roma: "Koutsuukei IC de haraimasu.", zh: "使用 Suica / PASMO 支付" },
-            { category: "支付/結帳", jp: "クレジットカードで払います。", roma: "Kreditto kaado de haraimasu.", zh: "使用信用卡（插卡）" },
+            { category: "支付/結帳", jp: "クレジットカードは使えますか？", roma: "Kreditto kaado wa tsukaemasu ka?", zh: "請問可以刷卡嗎？" },
             { category: "支付/結帳", jp: "一括払いでお願いします。", roma: "Ikkatsu barai de onegaishimasu.", zh: "信用卡一次付清" },
             { category: "支付/結帳", jp: "PayPay / LINE Payで払います。", roma: "PayPay de haraimasu.", zh: "使用掃碼支付 (PayPay/LINE Pay)" },
             { category: "支付/結帳", jp: "現金で払います。", roma: "Genkin de haraimasu.", zh: "用現金支付" },
 
             // 🛍️ 退稅/購物
+            { category: "退稅/購物", jp: "いくらですか？", roma: "Ikura desu ka?", zh: "請問多少錢？" },
+            { category: "退稅/購物", jp: "これをください。", roma: "Kore wo kudasai.", zh: "我要買這個" },
+            { category: "退稅/購物", jp: "ほかの色はありますか？", roma: "Hoka no iro wa arimasu ka?", zh: "請問有其他的顏色嗎？" },
+            { category: "退稅/購物", jp: "別のサイズはありますか？", roma: "Betsu no saizu wa arimasu ka?", zh: "請問有其他尺寸嗎？" },
+            { category: "退稅/購物", jp: "割引はありますか？", roma: "Waribiki wa arimasu ka?", zh: "請問有打折嗎？" },
             { category: "退稅/購物", jp: "免税処理はできますか？", roma: "Menzei shori wa dekimasu ka?", zh: "請問這裡可以辦理退稅嗎？" },
             { category: "退稅/購物", jp: "パスポートはこちらです。", roma: "Pasupooto wa kochira desu.", zh: "這是我的護照" },
             { category: "退稅/購物", jp: "試着してもいいですか？", roma: "Shichaku shitemo ii desu ka?", zh: "請問可以試穿嗎？" },
             { category: "退稅/購物", jp: "新しい在庫はありますか？", roma: "Atarashii zaiko wa arimasu ka?", zh: "請問有新的現貨嗎？" },
-            { category: "退稅/購物", jp: "別のサイズはありますか？", roma: "Betsu no saizu wa arimasu ka?", zh: "請問有其他尺寸嗎？" },
 
             // 🍜 餐廳/點餐
+            { category: "餐廳/點餐", jp: "2名ですが、空いていますか？", roma: "Nimei desu ga, aite imasu ka?", zh: "我們有2位，請問有位子嗎？" },
+            { category: "餐廳/點餐", jp: "メニューをください。", roma: "Menyuu wo kudasai.", zh: "請給我菜單" },
+            { category: "餐廳/點餐", jp: "注文をお願いします。", roma: "Chuumon wo onegaishimasu.", zh: "我要點餐" },
+            { category: "餐廳/點餐", jp: "これをお願いします。", roma: "Kore wo onegaishimasu.", zh: "請給我這個（可配合手指菜單）" },
             { category: "餐廳/點餐", jp: "おすすめは何ですか？", roma: "Osume wa nan desu ka?", zh: "請問有推薦的餐點嗎？" },
             { category: "餐廳/點餐", jp: "店内利用でお願いします。", roma: "Tennaide onegaishimasu.", zh: "內用" },
             { category: "餐廳/點餐", jp: "持ち帰りでお願いします。", roma: "Mochikaeri de onegaishimasu.", zh: "外帶" },
-            { category: "餐廳/點餐", jp: "氷なし / ネギ抜きで。", roma: "Koori nashi / Negi nuki de.", zh: "去冰 / 不加蔥" },
-            { category: "餐廳/點餐", jp: "牛肉は食べられません。", roma: "Gyuuniku wa taberaremasen.", zh: "我不吃牛肉" },
-            { category: "餐廳/點餐", jp: "注文は以上です。", roma: "Chuumon wa ijou desu.", zh: "點餐完畢（就這些）" },
-            { category: "餐廳/點餐", jp: "お会計をお願いします。", roma: "Okaikei wo onegaishimasu.", zh: "麻煩請幫我結帳" },
-            { category: "餐廳/點餐", jp: "別々で払えますか？", roma: "Betsubetsu de haraemasu ka?", zh: "可以分開結帳嗎？" },
+            { category: "餐廳/點餐", jp: "お水をください。", roma: "Omizu wo kudasai.", zh: "請給我水" },
+            { category: "餐廳/点餐", jp: "氷抜きでお願いします。", roma: "Koori nuki de onegaishimasu.", zh: "請去冰" },
+            { category: "餐廳/點餐", jp: "砂糖少なめでお願いします。", roma: "Satou tsukaname de onegaishimasu.", zh: "請少糖" },
+            { category: "餐廳/點餐", jp: "お箸をもらえますか？", roma: "Ohashi wo moraemasu ka?", zh: "請給我筷子" },
+            { category: "餐廳/點餐", jp: "スプーンをもらえますか？", roma: "Supuun wo moraemasu ka?", zh: "請給我湯匙" },
+            { category: "餐廳/點餐", jp: "フォークをもらえますか？", roma: "Fooku wo moraemasu ka?", zh: "請給我叉子" },
+            { category: "餐廳/點餐", jp: "以上です。", roma: "Ijou desu.", zh: "就這樣（點餐完畢）" },
+
+            // 📸 觀光/問路
+            { category: "觀光/問路", jp: "○○はどこにありますか？", roma: "○○ wa doko ni arimasu ka?", zh: "請問○○在哪裡？" },
+            { category: "觀光/問路", jp: "トイレはどこですか？", roma: "Toire wa doko desu ka?", zh: "請問洗手間在哪裡？" },
+            { category: "觀光/問路", jp: "この席、空いていますか？", roma: "Kono seki, aite imasu ka?", zh: "請問這個位子有人坐嗎？" },
+            { category: "觀光/問路", jp: "写真を撮ってもらえますか？", roma: "Shashin wo totte moraemasu ka?", zh: "可以請你幫我們拍照嗎？" },
 
             // 🏨 飯店/交通
+            { category: "飯店/交通", jp: "機内に持ち込めますか？", roma: "Kinai ni mochikomemasu ka?", zh: "請問這個可以帶上飛機嗎？" },
+            { category: "飯店/交通", jp: "切符売り場はどこですか？", roma: "Kippu uriba wa doko desu ka?", zh: "請問售票處在哪裡？" },
+            { category: "飯店/交通", jp: "○○までの切符を2枚ください。", roma: "○○ made no kippu wo nimai kudasai.", zh: "請給我2張到○○的車票" },
+            { category: "飯店/交通", jp: "朝食付きですか？", roma: "Choushoku tsuki desu ka?", zh: "請問有附早餐嗎？" },
+            { category: "飯店/交通", jp: "Wi-Fiのパスワードは何ですか？", roma: "Wi-Fi no pasuwaado wa nan desu ka?", zh: "請問 Wi-Fi 密碼是什麼？" },
+            { category: "飯店/交通", jp: "これは何の料金ですか？", roma: "Kore wa nan no ryoukin desu ka?", zh: "請問這項是什麼費用？" },
             { category: "飯店/交通", jp: "荷物を預かってもらえますか？", roma: "Nimotsu wo azukatte moraemasu ka?", zh: "請問可以先寄放行李嗎？" },
             { category: "飯店/交通", jp: "チェックインをお願いします。", roma: "Chekkuin wo onegaishimasu.", zh: "辦理 Check-in 入住" },
-            { category: "飯店/交通", jp: "タクシーを呼んでいただけますか？", roma: "Takushii wo yonde itadakemasu ka?", zh: "請問可以幫忙叫計程車嗎？" },
-            { category: "飯店/交通", jp: "ここに行きたいです。", roma: "Koko ni ikitai desu.", zh: "我想去這個地方（配地圖秀給他看）" }
+            { category: "飯店/交通", jp: "タクシーを呼んでいただけますか？", roma: "Takushii wo yonde itadakemasu ka?", zh: "請問可以幫忙叫計程車嗎？" }
         ];
 
         let currentTag = "全部";
@@ -347,10 +365,10 @@
                 window.speechSynthesis.cancel();
                 const utter = new SpeechSynthesisUtterance(text);
                 utter.lang = 'ja-JP';
-                utter.rate = 0.85; // 稍微放慢語速更清晰
+                utter.rate = 0.85;
                 window.speechSynthesis.speak(utter);
             } else {
-                alert('您的裝置或瀏覽器不支援語音播放功能');
+                alert('您的裝置不支援語音播放功能');
             }
         }
 
