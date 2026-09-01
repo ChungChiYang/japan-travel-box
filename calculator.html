@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本購物速算與比價清單</title>
+    <style>
+        :root {
+            --primary-color: #007aff;
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --text-color: #1c1c1e;
+            --border-color: #e5e5ea;
+            --accent-green: #34c759;
+            --accent-orange: #ff9500;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding: 12px; max-width: 600px; margin: 0 auto; }
+
+        .card { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        h2 { font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+        
+        .rate-box { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+        .rate-box input { width: 80px; padding: 6px 8px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 8px; text-align: center; }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: #e3e3e8; border-radius: 10px; font-weight: bold; font-size: 0.95rem; cursor: pointer; color: #666; }
+        .tab-btn.active { background: var(--primary-color); color: white; }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 6px; }
+        input[type="number"], input[type="text"] { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 1rem; outline: none; }
+        
+        .btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .option-btn { padding: 8px 4px; border: 1px solid var(--border-color); background: white; border-radius: 8px; font-size: 0.85rem; cursor: pointer; text-align: center; }
+        .option-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); font-weight: bold; }
+
+        .result-panel { background: #f8f9fa; border-radius: 10px; padding: 12px; margin-top: 14px; border: 1px dashed var(--border-color); }
+        .result-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+        .result-jpy { font-size: 1.2rem; font-weight: bold; }
+        .result-twd { font-size: 1.6rem; font-weight: bold; color: var(--primary-color); }
+
+        .btn-submit { width: 100%; padding: 12px; background: var(--accent-green); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; margin-top: 12px; cursor: pointer; }
+
+        .tax-progress { background: #eef9f1; border: 1px solid #c6e7ce; border-radius: 10px; padding: 10px; margin-bottom: 12px; font-size: 0.85rem; }
+        .progress-bar-bg { background: #ddd; height: 8px; border-radius: 4px; margin-top: 6px; overflow: hidden; }
+        .progress-bar-fill { background: var(--accent-green); height: 100%; width: 0%; transition: width 0.3s; }
+
+        .item-card { border-bottom: 1px solid var(--border-color); padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .item-card:last-child { border-bottom: none; }
+        .item-info { flex: 1; }
+        .item-title { font-weight: bold; font-size: 0.95rem; }
+        .item-sub { font-size: 0.8rem; color: #666; margin-top: 2px; }
+        .item-price { text-align: right; margin-left: 10px; }
+        .btn-del { color: #ff3b30; background: none; border: none; font-size: 0.85rem; cursor: pointer; padding: 4px; margin-left: 8px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- 頂部匯率區 -->
+    <div class="card" style="padding: 12px 16px;">
+        <div class="rate-box">
+            <span>💱 當前匯率：</span>
+            <span>1 JPY =</span>
+            <input type="number" id="exchangeRate" value="0.215" step="0.001" onchange="calculate()">
+            <span>TWD</span>
+        </div>
+    </div>
+
+    <!-- 頁籤切換 -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('calcTab', this)">⚡ 現場速算器</button>
+        <button class="tab-btn" onclick="switchTab('listTab', this)">📋 比價購物清單</button>
+    </div>
+
+    <!-- 頁籤 1：速算器 -->
+    <div id="calcTab" class="tab-content active">
+        <div class="card">
+            <div class="form-group">
+                <label>標籤標價 (日幣)</label>
+                <input type="number" id="inputPrice" placeholder="請輸入標籤上的金額" oninput="calculate()">
+            </div>
+
+            <div class="form-group">
+                <label>標價類型</label>
+                <div class="btn-group">
+                    <div class="option-btn active" id="typeEx" onclick="setPriceType('ex')">未稅 (税抜)</div>
+                    <div class="option-btn" id="typeIn" onclick="setPriceType('in')">含稅 (税込)</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>數量</label>
+                <input type="number" id="inputQty" value="1" min="1" oninput="calculate()">
+            </div>
+
+            <div class="form-group">
+                <label>優惠券折扣</label>
+                <div class="btn-group">
+                    <div class="option-btn active" onclick="setDiscount(1, this)">無折扣</div>
+                    <div class="option-btn" onclick="setDiscount(0.97, this)">97 折 (-3%)</div>
+                    <div class="option-btn" onclick="setDiscount(0.95, this)">95 折 (-5%)</div>
+                    <div class="option-btn" onclick="setDiscount(0.93, this)">93 折 (-7%)</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>結帳稅率</label>
+                <div class="btn-group" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="option-btn active" id="tax0" onclick="setTax(0, this)">免稅 0%</div>
+                    <div class="option-btn" id="tax10" onclick="setTax(0.1, this)">標準 10%</div>
+                    <div class="option-btn" id="tax8" onclick="setTax(0.08, this)">輕減 8%</div>
+                </div>
+            </div>
+
+            <!-- 計算結果 -->
+            <div class="result-panel">
+                <div class="result-row">
+                    <span>折後總日幣：</span>
+                    <span class="result-jpy" id="resJpy">¥ 0</span>
+                </div>
+                <div class="result-row">
+                    <span>約合新台幣：</span>
+                    <span class="result-twd" id="resTwd">NT$ 0</span>
+                </div>
+            </div>
+
+            <button class="btn-submit" onclick="saveToList()">➕ 存入購物比價清單</button>
+        </div>
+    </div>
+
+    <!-- 頁籤 2：比價與購物清單 -->
+    <div id="listTab" class="tab-content">
+        <!-- 免稅門檻進度 -->
+        <div class="tax-progress">
+            <div style="display: flex; justify-content: space-between;">
+                <span>🛒 清單未稅累計：<b id="untaxedTotal">¥ 0</b></span>
+                <span id="taxStatus" style="color: var(--accent-orange); font-weight: bold;">還差 ¥ 5,000 免稅</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>
+                <span>購物項目清單</span>
+                <span style="font-size: 0.85rem; font-weight: normal; color: #666;" id="listSummary">共 0 項</span>
+            </h2>
+            <div id="itemList">
+                <p style="text-align: center; color: #999; padding: 20px 0;">目前無紀錄，請從速算器新增！</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 核心狀態 variables
+        let priceType = 'ex'; // 'ex': 未稅, 'in': 含稅
+        let discountRate = 1; 
+        let taxRate = 0; 
+        let items = JSON.parse(localStorage.getItem('japan_shopping_list') || '[]');
+
+        // 初始化
+        window.onload = () => {
+            renderList();
+        };
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function setPriceType(type) {
+            priceType = type;
+            document.getElementById('typeEx').classList.toggle('active', type === 'ex');
+            document.getElementById('typeIn').classList.toggle('active', type === 'in');
+            calculate();
+        }
+
+        function setDiscount(rate, btn) {
+            discountRate = rate;
+            btn.parentElement.querySelectorAll('.option-btn').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            calculate();
+        }
+
+        function setTax(rate, btn) {
+            taxRate = rate;
+            btn.parentElement.querySelectorAll('.option-btn').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            calculate();
+        }
+
+        function calculate() {
+            const rawPrice = parseFloat(document.getElementById('inputPrice').value) || 0;
+            const qty = parseInt(document.getElementById('inputQty').value) || 1;
+            const rate = parseFloat(document.getElementById('exchangeRate').value) || 0.215;
+
+            // 1. 還原/計算未稅基底
+            let baseUntaxed = priceType === 'in' ? (rawPrice / 1.1) : rawPrice;
+            
+            // 2. 套用折扣與數量
+            let discountedUntaxed = baseUntaxed * discountRate * qty;
+
+            // 3. 加上最終選擇的稅率
+            let finalJpy = Math.round(discountedUntaxed * (1 + taxRate));
+            let finalTwd = Math.round(finalJpy * rate);
+
+            // 4. 顯示結果
+            document.getElementById('resJpy').innerText = `¥ ${finalJpy.toLocaleString()}`;
+            document.getElementById('resTwd').innerText = `NT$ ${finalTwd.toLocaleString()}`;
+
+            return { rawPrice, qty, baseUntaxedTotal: baseUntaxed * qty, finalJpy, finalTwd };
+        }
+
+        function saveToList() {
+            const calc = calculate();
+            if (calc.rawPrice <= 0) {
+                alert('請先輸入有效的商品金額！');
+                return;
+            }
+
+            const name = prompt('請輸入商品名稱或備註（例：合利他命 / 唐吉訶德）：');
+            if (!name) return;
+
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                baseUntaxedTotal: calc.baseUntaxedTotal,
+                jpy: calc.finalJpy,
+                twd: calc.finalTwd
+            };
+
+            items.push(newItem);
+            localStorage.setItem('japan_shopping_list', JSON.stringify(items));
+            renderList();
+            
+            // 自動切換到清單頁面
+            switchTab('listTab', document.querySelectorAll('.tab-btn')[1]);
+        }
+
+        function deleteItem(id) {
+            items = items.filter(item => item.id !== id);
+            localStorage.setItem('japan_shopping_list', JSON.stringify(items));
+            renderList();
+        }
+
+        function renderList() {
+            const listEl = document.getElementById('itemList');
+            const rate = parseFloat(document.getElementById('exchangeRate').value) || 0.215;
+
+            if (items.length === 0) {
+                listEl.innerHTML = `<p style="text-align: center; color: #999; padding: 20px 0;">目前無紀錄，請從速算器新增！</p>`;
+                document.getElementById('untaxedTotal').innerText = `¥ 0`;
+                document.getElementById('taxStatus').innerText = `還差 ¥ 5,000 免稅`;
+                document.getElementById('taxStatus').style.color = `var(--accent-orange)`;
+                document.getElementById('progressBar').style.width = `0%`;
+                document.getElementById('listSummary').innerText = `共 0 項`;
+                return;
+            }
+
+            let html = '';
+            let untaxedSum = 0;
+            let twdSum = 0;
+
+            items.forEach(item => {
+                untaxedSum += item.baseUntaxedTotal;
+                twdSum += item.twd;
+
+                html += `
+                <div class="item-card">
+                    <div class="item-info">
+                        <div class="item-title">${item.name}</div>
+                        <div class="item-sub">折後日幣：¥ ${item.jpy.toLocaleString()}</div>
+                    </div>
+                    <div class="item-price">
+                        <div style="font-weight: bold; color: var(--primary-color);">NT$ ${item.twd.toLocaleString()}</div>
+                    </div>
+                    <button class="btn-del" onclick="deleteItem(${item.id})">刪除</button>
+                </div>
+                `;
+            });
+
+            listEl.innerHTML = html;
+            document.getElementById('listSummary').innerText = `共 ${items.length} 項，總計 NT$ ${twdSum.toLocaleString()}`;
+            
+            // 更新免稅門檻
+            document.getElementById('untaxedTotal').innerText = `¥ ${Math.round(untaxedSum).toLocaleString()}`;
+            let progress = Math.min((untaxedSum / 5000) * 100, 100);
+            document.getElementById('progressBar').style.width = `${progress}%`;
+
+            if (untaxedSum >= 5000) {
+                document.getElementById('taxStatus').innerText = `🎉 已達免稅門檻！`;
+                document.getElementById('taxStatus').style.color = `var(--accent-green)`;
+            } else {
+                let diff = 5000 - Math.round(untaxedSum);
+                document.getElementById('taxStatus').innerText = `還差 ¥ ${diff.toLocaleString()} 免稅`;
+                document.getElementById('taxStatus').style.color = `var(--accent-orange)`;
+            }
+        }
+    </script>
+</body>
+</html>
