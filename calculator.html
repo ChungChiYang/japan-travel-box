@@ -63,9 +63,9 @@
             font-size: 1rem;
         }
 
-        .grid-2 {
+        .grid-3 {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
         }
 
@@ -116,7 +116,6 @@
             border-radius: 8px;
         }
 
-        /* 清單控制工具列 */
         .list-header {
             display: flex;
             justify-content: space-between;
@@ -146,7 +145,6 @@
             margin: 0;
         }
 
-        /* 品項卡片與狀態 */
         .item-card {
             background: var(--card-bg);
             padding: 12px 15px;
@@ -159,7 +157,6 @@
             transition: opacity 0.3s, background-color 0.3s;
         }
 
-        /* 已購買狀態：顏色變淡、刪除線 */
         .item-card.purchased {
             opacity: 0.45;
             background-color: #f1f3f5;
@@ -188,6 +185,18 @@
         .item-info { flex: 1; font-size: 0.95rem; }
         .item-info strong { display: block; color: #1d3557; }
         .item-info span { font-size: 0.8rem; color: #777; }
+        
+        .qty-tag {
+            display: inline-block;
+            background: #e0e1dd;
+            color: #1d3557;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            margin-left: 4px;
+        }
+
         .item-price { text-align: right; }
         .item-price .twd { font-size: 1rem; font-weight: bold; color: #1d3557; }
         .item-price .jpy { font-size: 0.8rem; color: var(--primary); }
@@ -202,6 +211,15 @@
         }
         .total-box h3 { margin: 0 0 5px 0; font-size: 1rem; opacity: 0.9; }
         .total-box .price-large { font-size: 1.8rem; font-weight: bold; color: #4cc9f0; }
+        .total-box .qty-summary {
+            font-size: 0.95rem;
+            color: #f1faee;
+            margin-top: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
 
         #import-file { display: none; }
     </style>
@@ -235,14 +253,18 @@
             <input type="text" id="item-name" placeholder="例：合利他命 270錠 (BicCamera)">
         </div>
 
-        <div class="grid-2">
+        <div class="grid-3">
             <div class="form-group">
-                <label for="item-price">日幣原價 (JPY)</label>
+                <label for="item-price">日幣單價</label>
                 <input type="number" id="item-price" placeholder="5000" oninput="updateLivePreview()">
             </div>
             <div class="form-group">
-                <label for="item-discount">折扣 (折數 / %)</label>
-                <input type="number" id="item-discount" value="100" placeholder="95 代表 95 折" oninput="updateLivePreview()">
+                <label for="item-qty">數量</label>
+                <input type="number" id="item-qty" value="1" min="1" oninput="updateLivePreview()">
+            </div>
+            <div class="form-group">
+                <label for="item-discount">折扣 (%)</label>
+                <input type="number" id="item-discount" value="100" placeholder="95" oninput="updateLivePreview()">
             </div>
         </div>
 
@@ -255,9 +277,9 @@
             </select>
         </div>
 
-        <!-- 即時計算預覽卡片 -->
+        <!-- 即時計算預覽卡片（乘上數量後的總額） -->
         <div class="live-calc-preview">
-            <span>折後含稅日幣: <span id="preview-jpy">¥ 0</span></span>
+            <span>預覽總日幣: <span id="preview-jpy">¥ 0</span></span>
             <span>約合台幣: <strong id="preview-twd">NT$ 0</strong></span>
         </div>
 
@@ -282,6 +304,7 @@
         <h3 id="total-title">預估結帳金額 (已選取品項)</h3>
         <div class="price-large" id="total-twd">約 NT$ 0</div>
         <div id="total-jpy" style="opacity: 0.8; font-size:0.9rem; margin-top:4px;">(總計 ¥ 0)</div>
+        <div class="qty-summary" id="total-qty">選取件數：0 件</div>
     </div>
 </div>
 
@@ -311,11 +334,12 @@
     function updateLivePreview() {
         const rate = parseFloat(document.getElementById('rate').value) || 0;
         const rawPrice = parseFloat(document.getElementById('item-price').value) || 0;
+        const qty = parseInt(document.getElementById('item-qty').value) || 1;
         const discount = parseFloat(document.getElementById('item-discount').value) || 100;
         const taxRate = parseFloat(document.getElementById('item-tax').value) || 1.0;
 
-        const discountedPrice = rawPrice * (discount / 100);
-        const finalJPY = Math.round(discountedPrice * taxRate);
+        const discountedUnitPrice = rawPrice * (discount / 100);
+        const finalJPY = Math.round(discountedUnitPrice * taxRate * qty);
         const finalTWD = Math.round(finalJPY * rate);
 
         document.getElementById('preview-jpy').innerText = `¥ ${finalJPY.toLocaleString()}`;
@@ -325,16 +349,18 @@
     function addItem() {
         const nameInput = document.getElementById('item-name');
         const priceInput = document.getElementById('item-price');
+        const qtyInput = document.getElementById('item-qty');
         const discountInput = document.getElementById('item-discount');
         const taxSelect = document.getElementById('item-tax');
 
         const name = nameInput.value.trim() || '未命名商品';
         const rawPrice = parseFloat(priceInput.value);
+        const qty = parseInt(qtyInput.value) || 1;
         const discount = parseFloat(discountInput.value) || 100;
         const taxRate = parseFloat(taxSelect.value) || 1.0;
 
         if (isNaN(rawPrice) || rawPrice <= 0) {
-            alert('請輸入有效的日幣金額');
+            alert('請輸入有效的日幣單價');
             return;
         }
 
@@ -346,11 +372,12 @@
             id: Date.now(),
             name: name,
             price: rawPrice,
+            qty: qty,
             discount: discount,
             taxRate: taxRate,
             taxLabel: taxLabel,
-            inCart: true,      // 預設加入購物車（參與試算）
-            purchased: false   // 預設未購買
+            inCart: true,
+            purchased: false
         });
 
         saveData();
@@ -358,24 +385,32 @@
 
         nameInput.value = '';
         priceInput.value = '';
+        qtyInput.value = '1';
         discountInput.value = '100';
         updateLivePreview();
     }
 
-    // 切換單一品項的勾選狀態
     function toggleStatus(id, key) {
         const item = state.items.find(i => i.id === id);
         if (item) {
             item[key] = !item[key];
+            
+            // 邏輯優化：勾選已買時自動取消試算
+            if (key === 'purchased' && item.purchased) {
+                item.inCart = false;
+            } else if (key === 'purchased' && !item.purchased) {
+                item.inCart = true;
+            }
+
             saveData();
             render();
         }
     }
 
-    // 全選 / 取消全選（讓所有商品加入購物車）
     function toggleSelectAll(checked) {
         state.items.forEach(item => {
             item.inCart = checked;
+            if (checked) item.purchased = false; // 全選試算時重置已買狀態
         });
         saveData();
         render();
@@ -394,8 +429,8 @@
 
         let totalJPY = 0;
         let totalTWD = 0;
+        let totalQty = 0;
 
-        // 檢查是否所有品項都被勾選入購物車
         const selectAllCheckbox = document.getElementById('select-all');
         if (state.items.length > 0) {
             selectAllCheckbox.checked = state.items.every(item => item.inCart);
@@ -404,14 +439,16 @@
         }
 
         state.items.forEach(item => {
-            const discountedPrice = item.price * (item.discount / 100);
-            const finalJPY = Math.round(discountedPrice * (item.taxRate || 1.0));
-            const finalTWD = Math.round(finalJPY * state.rate);
+            const qty = item.qty || 1;
+            const discountedUnitPrice = item.price * (item.discount / 100);
+            const itemTotalJPY = Math.round(discountedUnitPrice * (item.taxRate || 1.0) * qty);
+            const itemTotalTWD = Math.round(itemTotalJPY * state.rate);
             
-            // 只有「加入購物車」勾選的品項才納入金額統計
+            // 計入已選取試算項目
             if (item.inCart) {
-                totalJPY += finalJPY;
-                totalTWD += finalTWD;
+                totalJPY += itemTotalJPY;
+                totalTWD += itemTotalTWD;
+                totalQty += qty;
             }
 
             const li = document.createElement('li');
@@ -426,19 +463,18 @@
                     </label>
                 </div>
                 <div class="item-info">
-                    <strong class="item-name">${escapeHtml(item.name)}</strong>
-                    <span>原價 ¥${item.price.toLocaleString()} | ${item.discount < 100 ? `${item.discount}折` : '無折扣'} | 稅率: ${item.taxLabel}</span>
+                    <strong class="item-name">${escapeHtml(item.name)} <span class="qty-tag">x${qty}</span></strong>
+                    <span>單價 ¥${item.price.toLocaleString()} | ${item.discount < 100 ? `${item.discount}折` : '無折扣'} | 稅率: ${item.taxLabel}</span>
                 </div>
                 <div class="item-price">
-                    <div class="twd">約 NT$ ${finalTWD.toLocaleString()}</div>
-                    <div class="jpy">¥ ${finalJPY.toLocaleString()}</div>
+                    <div class="twd">約 NT$ ${itemTotalTWD.toLocaleString()}</div>
+                    <div class="jpy">¥ ${itemTotalJPY.toLocaleString()}</div>
                 </div>
                 <button class="btn-danger" style="flex:none; padding: 6px 10px; margin-left:5px;" onclick="deleteItem(${item.id})">🗑️</button>
             `;
             listEl.appendChild(li);
         });
 
-        // 動態調整總結區文字標題
         const totalTitleEl = document.getElementById('total-title');
         if (selectAllCheckbox.checked && state.items.length > 0) {
             totalTitleEl.innerText = "全趟行程所有商品總額 (全選)";
@@ -448,6 +484,7 @@
 
         document.getElementById('total-jpy').innerText = `(總計 ¥ ${totalJPY.toLocaleString()})`;
         document.getElementById('total-twd').innerText = `約 NT$ ${totalTWD.toLocaleString()}`;
+        document.getElementById('total-qty').innerText = `選取商品總數量：${totalQty} 件`;
     }
 
     function escapeHtml(str) {
