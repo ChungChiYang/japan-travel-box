@@ -951,7 +951,20 @@
                 saveData(); refreshScheduleView();
             }
         }
+		// 功能：導出 JSON 檔案（自動帶出當天日期）
+		function exportJSON() {
+  			const today = new Date().toISOString().slice(0, 10);
+  			const fileName = `travel_planner_backup_${today}.json`;
 
+		    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(plannerData, null, 2));
+ 		    const dlAnchor = document.createElement('a');
+  		    dlAnchor.setAttribute("href", dataStr);
+ 		    dlAnchor.setAttribute("download", fileName);
+  		    document.body.appendChild(dlAnchor);
+  		   dlAnchor.click();
+   		   dlAnchor.remove();
+		}
+		/*
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(plannerData, null, 2));
             const dlAnchor = document.createElement('a');
@@ -961,7 +974,8 @@
             dlAnchor.click();
             dlAnchor.remove();
         }
-
+		*/
+		
         function importJSON(event) {
             const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
