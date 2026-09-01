@@ -47,7 +47,7 @@
         .menu-item.disabled { opacity: 0.4; cursor: not-allowed; }
         .sidebar-footer { padding: 1rem; font-size: 0.75rem; text-align: center; color: #a8dadc; border-top: 1px solid rgba(255,255,255,0.1); }
 
-        /* 📱 手機專用漢堡選單按鈕 (電腦版隱藏) */
+        /* 📱 手機專用漢堡選單按鈕 */
         .menu-toggle {
             display: none;
             position: fixed;
@@ -83,13 +83,9 @@
             display: block;
         }
 
-        /* ==================== 📱 手機版 RWD 強制突變設定 ==================== */
+        /* ==================== 📱 手機版 RWD 設定 ==================== */
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-
-            /* 1. 把礙事的側邊欄直接做成手機側滑抽屜（預案隱藏） */
+            body { flex-direction: column; }
             .sidebar {
                 position: fixed;
                 left: -260px;
@@ -98,24 +94,14 @@
                 z-index: 99998;
                 width: 260px;
             }
-            .sidebar.open {
-                left: 0;
-            }
-
-            /* 2. 顯示浮動切換鈕 */
-            .menu-toggle {
-                display: block;
-            }
-
-            /* 3. 徹底解放右側 iframe 容器，給它 100% 的乾淨寬度 */
+            .sidebar.open { left: 0; }
+            .menu-toggle { display: block; }
             .main-container {
                 width: 100vw !important;
                 max-width: 100vw !important;
                 height: 100vh !important;
                 overflow-x: hidden;
             }
-            
-            /* 強制限制 iframe 視窗範圍，逼迫內部 HTML 認清手機寬度 */
             #tool-runner {
                 width: 100% !important;
                 min-width: 100% !important;
@@ -131,7 +117,7 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2>🧳 智慧旅遊盒子</h2>
-            <p>Version 2.6 (手機完美優化版)</p>
+            <p>Version 2.7 (現場溝通增強版)</p>
         </div>
         <ul class="menu-list">
             <div class="menu-divider">目前工具</div>
@@ -140,6 +126,10 @@
             </li>
             <li class="menu-item" onclick="loadTool('database.html', this)">
                 <span>🇯🇵</span> 自由行情報資料庫
+            </li>
+            <!-- 新增第三個分頁 -->
+            <li class="menu-item" onclick="loadTool('communication.html', this)">
+                <span>🗣️</span> 現場日語指談助手
             </li>
         </ul>
         <div class="sidebar-footer">
@@ -152,42 +142,33 @@
     </div>
 
     <script>
-        // 1. 切換手機版側邊欄抽屜
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
         }
 
-        // 2. 核心切換分頁邏輯 (防呆修復版)
         function loadTool(fileName, element) {
             const iframe = document.getElementById('tool-runner');
             
-            // 🎯 防呆 1：如果點擊的是已經啟用的分頁，且頁面沒出錯，就只收起選單不重複載入
             if (element.classList.contains('active') && iframe.src.includes(fileName)) {
                 document.getElementById('sidebar').classList.remove('open');
                 return;
             }
 
-            // 🎯 防呆 2：正確切換 iframe 網址
             iframe.src = './' + fileName;
 
-            // 🎯 防呆 3：徹底清除所有選單的高亮，只給當前點擊的項目加上 active
             const allMenuItems = document.querySelectorAll('.menu-item');
             allMenuItems.forEach(item => item.classList.remove('active'));
             element.classList.add('active');
 
-            // 🎯 防呆 4：解決「切換沒反應/不跳畫面」！強制將主容器與 iframe 內部捲軸拉回最頂端
             window.scrollTo(0, 0);
             const mainContainer = document.querySelector('.main-container');
             if (mainContainer) mainContainer.scrollTop = 0;
 
-            // 🎯 防呆 5：手機版點選後，自動收回左側抽屜
             document.getElementById('sidebar').classList.remove('open');
         }
 
-        // 🎯 3. 網頁首次初始化：確保重新整理時，預設的高亮標籤跟載入的 iframe 100% 一致
         window.addEventListener('DOMContentLoaded', () => {
             const iframe = document.getElementById('tool-runner');
-            // 預設載入 database.html (自由行情報資料庫)
             iframe.src = './handbook.html';
         });
     </script>
