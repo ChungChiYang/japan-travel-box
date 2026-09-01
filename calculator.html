@@ -69,6 +69,24 @@
             gap: 10px;
         }
 
+        /* 輸入時的即時台幣預覽卡片 */
+        .live-calc-preview {
+            background: #edf2f4;
+            border-left: 4px solid var(--primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .live-calc-preview strong {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
         .btn-group {
             display: flex;
             gap: 8px;
@@ -121,8 +139,8 @@
         .item-info strong { display: block; color: #1d3557; }
         .item-info span { font-size: 0.8rem; color: #777; }
         .item-price { text-align: right; }
-        .item-price .jpy { font-weight: bold; color: var(--primary); }
-        .item-price .twd { font-size: 0.85rem; color: #666; }
+        .item-price .twd { font-size: 1rem; font-weight: bold; color: #1d3557; }
+        .item-price .jpy { font-size: 0.8rem; color: var(--primary); }
 
         .total-box {
             background: #1d3557;
@@ -135,7 +153,6 @@
         .total-box h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
         .total-box .price-large { font-size: 1.8rem; font-weight: bold; color: #4cc9f0; }
 
-        /* 隱藏原生檔案選擇器 */
         #import-file { display: none; }
     </style>
 </head>
@@ -153,40 +170,48 @@
         <input type="file" id="import-file" accept=".json" onchange="importJSON(event)">
     </div>
 
-    <!-- 匯率與稅率設定 -->
+    <!-- 頂部通用匯率設定 -->
     <div class="card">
-        <div class="grid-2">
-            <div class="form-group">
-                <label for="rate">日圓匯率 (JPY ➡️ TWD)</label>
-                <input type="number" id="rate" step="0.0001" value="0.21" onchange="saveData(); render();">
-            </div>
-            <div class="form-group">
-                <label for="tax">消費稅率 (%)</label>
-                <select id="tax" onchange="saveData(); render();">
-                    <option value="1.10">10% (一般商品)</option>
-                    <option value="1.08">8% (食品/輕稅)</option>
-                    <option value="1.00">免稅 (Tax Free)</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label for="rate">日圓匯率 (JPY ➡️ TWD)</label>
+            <input type="number" id="rate" step="0.0001" value="0.21" oninput="updateLivePreview(); render();">
         </div>
     </div>
 
-    <!-- 新增品項 -->
+    <!-- 新增品項 (每個品項獨立設定稅率) -->
     <div class="card">
         <div class="form-group">
             <label for="item-name">商品名稱 / 店名</label>
             <input type="text" id="item-name" placeholder="例：合利他命 270錠 (BicCamera)">
         </div>
+
         <div class="grid-2">
             <div class="form-group">
-                <label for="item-price">日幣未稅價 (JPY)</label>
-                <input type="number" id="item-price" placeholder="5000">
+                <label for="item-price">日幣原價 (JPY)</label>
+                <input type="number" id="item-price" placeholder="5000" oninput="updateLivePreview()">
             </div>
             <div class="form-group">
-                <label for="item-discount">折扣 (折頭 / %)</label>
-                <input type="number" id="item-discount" value="100" placeholder="95 代表 95 折">
+                <label for="item-discount">折扣 (折數 / %)</label>
+                <input type="number" id="item-discount" value="100" placeholder="95 代表 95 折" oninput="updateLivePreview()">
             </div>
         </div>
+
+        <!-- 稅率選單移至單品項輸入區 -->
+        <div class="form-group">
+            <label for="item-tax">適用消費稅率 / 免稅</label>
+            <select id="item-tax" onchange="updateLivePreview()">
+                <option value="1.00">免稅 0% (Tax Free / 滿額退稅)</option>
+                <option value="1.10" selected>一般商品 10% (服飾、電器、日用)</option>
+                <option value="1.08">食品/輕稅 8% (超市外帶、零食)</option>
+            </select>
+        </div>
+
+        <!-- 輸入期間即時計算預覽 (跳台幣價) -->
+        <div class="live-calc-preview">
+            <span>折後含稅日幣: <span id="preview-jpy">¥ 0</span></span>
+            <span>約合台幣: <strong id="preview-twd">NT$ 0</strong></span>
+        </div>
+
         <div class="btn-group">
             <button class="btn-primary" onclick="addItem()">➕ 新增品項</button>
         </div>
@@ -197,16 +222,15 @@
 
     <!-- 總計區 -->
     <div class="total-box">
-        <h3>預估結帳總額 (折後含稅)</h3>
-        <div class="price-large" id="total-jpy">¥ 0</div>
-        <div id="total-twd">約 NT$ 0</div>
+        <h3>預估結帳總額</h3>
+        <div class="price-large" id="total-twd">約 NT$ 0</div>
+        <div id="total-jpy" style="opacity: 0.8; font-size:0.9rem; margin-top:4px;">(總計 ¥ 0)</div>
     </div>
 </div>
 
 <script>
     let state = {
         rate: 0.21,
-        tax: 1.10,
         items: []
     };
 
@@ -217,7 +241,6 @@
             try {
                 state = JSON.parse(saved);
                 document.getElementById('rate').value = state.rate || 0.21;
-                document.getElementById('tax').value = state.tax || 1.10;
             } catch (e) {
                 console.error("資料解析失敗", e);
             }
@@ -227,30 +250,53 @@
     // 儲存至 LocalStorage
     function saveData() {
         state.rate = parseFloat(document.getElementById('rate').value) || 0.21;
-        state.tax = parseFloat(document.getElementById('tax').value) || 1.10;
         localStorage.setItem('shopping_calculator_data', JSON.stringify(state));
     }
 
-    // 新增品項
+    // 🎯 輸入期間即時計算預覽 (跳台幣金額)
+    function updateLivePreview() {
+        const rate = parseFloat(document.getElementById('rate').value) || 0;
+        const rawPrice = parseFloat(document.getElementById('item-price').value) || 0;
+        const discount = parseFloat(document.getElementById('item-discount').value) || 100;
+        const taxRate = parseFloat(document.getElementById('item-tax').value) || 1.0;
+
+        const discountedPrice = rawPrice * (discount / 100);
+        const finalJPY = Math.round(discountedPrice * taxRate);
+        const finalTWD = Math.round(finalJPY * rate);
+
+        document.getElementById('preview-jpy').innerText = `¥ ${finalJPY.toLocaleString()}`;
+        document.getElementById('preview-twd').innerText = `NT$ ${finalTWD.toLocaleString()}`;
+    }
+
+    // 🎯 新增品項：將「當下選取的稅率與計算結果」鎖定存入物件
     function addItem() {
         const nameInput = document.getElementById('item-name');
         const priceInput = document.getElementById('item-price');
         const discountInput = document.getElementById('item-discount');
+        const taxSelect = document.getElementById('item-tax');
 
         const name = nameInput.value.trim() || '未命名商品';
         const rawPrice = parseFloat(priceInput.value);
         const discount = parseFloat(discountInput.value) || 100;
+        const taxRate = parseFloat(taxSelect.value) || 1.0;
 
         if (isNaN(rawPrice) || rawPrice <= 0) {
             alert('請輸入有效的日幣金額');
             return;
         }
 
+        // 稅率名稱標記
+        let taxLabel = '免稅';
+        if (taxRate === 1.10) taxLabel = '10%';
+        if (taxRate === 1.08) taxLabel = '8%';
+
         state.items.push({
             id: Date.now(),
             name: name,
             price: rawPrice,
-            discount: discount
+            discount: discount,
+            taxRate: taxRate,   // 獨立鎖定品項稅率
+            taxLabel: taxLabel
         });
 
         saveData();
@@ -259,6 +305,7 @@
         nameInput.value = '';
         priceInput.value = '';
         discountInput.value = '100';
+        updateLivePreview();
     }
 
     // 刪除品項
@@ -268,47 +315,54 @@
         render();
     }
 
-    // 渲染 UI
+    // 渲染列表
     function render() {
+        saveData();
         const listEl = document.getElementById('item-list');
         listEl.innerHTML = '';
 
         let totalJPY = 0;
+        let totalTWD = 0;
 
         state.items.forEach(item => {
             const discountedPrice = item.price * (item.discount / 100);
-            const finalJPY = Math.round(discountedPrice * state.tax);
+            const finalJPY = Math.round(discountedPrice * (item.taxRate || 1.0));
             const finalTWD = Math.round(finalJPY * state.rate);
+            
             totalJPY += finalJPY;
+            totalTWD += finalTWD;
 
             const li = document.createElement('li');
             li.className = 'item-card';
             li.innerHTML = `
                 <div class="item-info">
-                    <strong>${item.name}</strong>
-                    <span>原價 ¥${item.price.toLocaleString()} ${item.discount < 100 ? `(${item.discount}折)` : ''}</span>
+                    <strong>${escapeHtml(item.name)}</strong>
+                    <span>原價 ¥${item.price.toLocaleString()} | ${item.discount < 100 ? `${item.discount}折` : '無折扣'} | 稅率: ${item.taxLabel}</span>
                 </div>
                 <div class="item-price">
-                    <div class="jpy">¥ ${finalJPY.toLocaleString()}</div>
                     <div class="twd">約 NT$ ${finalTWD.toLocaleString()}</div>
+                    <div class="jpy">¥ ${finalJPY.toLocaleString()}</div>
                 </div>
                 <button class="btn-danger" style="flex:none; padding: 6px 10px; margin-left:10px;" onclick="deleteItem(${item.id})">🗑️</button>
             `;
             listEl.appendChild(li);
         });
 
-        const totalTWD = Math.round(totalJPY * state.rate);
-        document.getElementById('total-jpy').innerText = `¥ ${totalJPY.toLocaleString()}`;
+        document.getElementById('total-jpy').innerText = `(總計 ¥ ${totalJPY.toLocaleString()})`;
         document.getElementById('total-twd').innerText = `約 NT$ ${totalTWD.toLocaleString()}`;
     }
 
-    // 📥 匯出 JSON
+    function escapeHtml(str) {
+        return str.replace(/[&<>"']/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+        });
+    }
+
+    // 📥 匯出 JSON (檔名帶當天日期)
     function exportJSON() {
         saveData();
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
         const downloadAnchor = document.createElement('a');
-        
-        // 檔名加上日期時間，方便辨識
         const today = new Date().toISOString().slice(0, 10);
         downloadAnchor.setAttribute("href", dataStr);
         downloadAnchor.setAttribute("download", `japan_shopping_backup_${today}.json`);
@@ -330,8 +384,8 @@
                     state = importedData;
                     saveData();
                     document.getElementById('rate').value = state.rate || 0.21;
-                    document.getElementById('tax').value = state.tax || 1.10;
                     render();
+                    updateLivePreview();
                     alert('匯入成功！清單與設定已更新。');
                 } else {
                     alert('匯入失敗：JSON 格式不符。');
@@ -341,13 +395,13 @@
             }
         };
         reader.readAsText(file);
-        // 清空 input 讓重複選同一個檔名時也能觸發 change
         event.target.value = '';
     }
 
-    // 頁面初始化
+    // 初始化
     loadData();
     render();
+    updateLivePreview();
 </script>
 
 </body>
