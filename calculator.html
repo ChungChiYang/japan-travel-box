@@ -390,18 +390,11 @@
         updateLivePreview();
     }
 
+    // 簡化：讓 Checkbox 狀態完全獨立，不再互斥或連動
     function toggleStatus(id, key) {
         const item = state.items.find(i => i.id === id);
         if (item) {
             item[key] = !item[key];
-            
-            // 邏輯優化：勾選已買時自動取消試算
-            if (key === 'purchased' && item.purchased) {
-                item.inCart = false;
-            } else if (key === 'purchased' && !item.purchased) {
-                item.inCart = true;
-            }
-
             saveData();
             render();
         }
@@ -410,7 +403,6 @@
     function toggleSelectAll(checked) {
         state.items.forEach(item => {
             item.inCart = checked;
-            if (checked) item.purchased = false; // 全選試算時重置已買狀態
         });
         saveData();
         render();
@@ -444,8 +436,8 @@
             const itemTotalJPY = Math.round(discountedUnitPrice * (item.taxRate || 1.0) * qty);
             const itemTotalTWD = Math.round(itemTotalJPY * state.rate);
             
-            // 計入已選取試算項目
-            if (item.inCart) {
+            // 核心規則修正：只有在「勾選試算」且「未勾選已買」時才計入總額
+            if (item.inCart && !item.purchased) {
                 totalJPY += itemTotalJPY;
                 totalTWD += itemTotalTWD;
                 totalQty += qty;
@@ -477,9 +469,9 @@
 
         const totalTitleEl = document.getElementById('total-title');
         if (selectAllCheckbox.checked && state.items.length > 0) {
-            totalTitleEl.innerText = "全趟行程所有商品總額 (全選)";
+            totalTitleEl.innerText = "全趟行程未購買商品總額 (全選試算)";
         } else {
-            totalTitleEl.innerText = "預估結帳金額 (已選取試算品項)";
+            totalTitleEl.innerText = "預估結帳金額 (已選取試算且未買品項)";
         }
 
         document.getElementById('total-jpy').innerText = `(總計 ¥ ${totalJPY.toLocaleString()})`;
