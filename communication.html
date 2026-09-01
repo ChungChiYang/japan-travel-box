@@ -2,39 +2,57 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>現場日語指談助手</title>
     <style>
         :root {
-            --primary: #e63946;
-            --bg: #f8f9fa;
+            --primary-color: #e63946;
+            --secondary-color: #1d3557;
+            --bg-color: #f8f9fa;
             --card-bg: #ffffff;
-            --text: #2b2d42;
+            --text-color: #2b2d42;
         }
 
         * { box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 16px;
-            padding-bottom: 40px;
+            padding-bottom: 60px;
         }
 
-        h2 { margin-top: 0; color: #1d3557; display: flex; align-items: center; gap: 8px; }
-        
-        /* 搜尋與篩選列 */
+        .header {
+            margin-bottom: 12px;
+        }
+        .header h2 {
+            margin: 0 0 4px 0;
+            color: var(--secondary-color);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header p {
+            margin: 0;
+            font-size: 0.82rem;
+            color: #6c757d;
+        }
+
+        /* 搜尋與分類 Tag */
         .search-box {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 10px 14px;
+            border: 1.5px solid #ced4da;
+            border-radius: 10px;
+            font-size: 15px;
+            margin-top: 10px;
             margin-bottom: 12px;
             outline: none;
+            transition: border-color 0.2s;
         }
-        .search-box:focus { border-color: var(--primary); }
+        .search-box:focus { border-color: var(--primary-color); }
 
         .tags-container {
             display: flex;
@@ -44,23 +62,27 @@
             margin-bottom: 16px;
             -webkit-overflow-scrolling: touch;
         }
+        .tags-container::-webkit-scrollbar { display: none; }
+        
         .tag-btn {
             background: #e9ecef;
             border: none;
             padding: 8px 14px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13.5px;
             white-space: nowrap;
             cursor: pointer;
             color: #495057;
+            transition: all 0.2s;
         }
         .tag-btn.active {
-            background: var(--primary);
+            background: var(--primary-color);
             color: white;
-            font-weight: bold;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(230, 57, 70, 0.3);
         }
 
-        /* 卡片網格 */
+        /* 卡片列表 */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -69,34 +91,36 @@
         .card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-            border: 1px solid #eee;
+            padding: 14px 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
-        .card-header {
-            font-size: 13px;
+        .card-category {
+            font-size: 11px;
+            font-weight: 600;
             color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
         }
         .card-jp {
-            font-size: 20px;
-            font-weight: bold;
-            color: #1d3557;
-            margin-bottom: 4px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 2px;
+            line-height: 1.3;
         }
         .card-roma {
-            font-size: 13px;
+            font-size: 12px;
             color: #e63946;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .card-zh {
-            font-size: 15px;
-            color: #333;
+            font-size: 14px;
+            color: #495057;
             margin-bottom: 12px;
         }
         .card-actions {
@@ -105,86 +129,172 @@
         }
         .action-btn {
             flex: 1;
-            padding: 8px;
+            padding: 8px 12px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
+            transition: background 0.2s;
         }
-        .btn-speak { background: #e8f4f8; color: #1d3557; }
-        .btn-show { background: #ffe3e3; color: var(--primary); font-weight: bold; }
+        .btn-speak { background: #edf2f7; color: var(--secondary-color); }
+        .btn-speak:active { background: #cbd5e1; }
+        .btn-show { background: #ffe5e5; color: var(--primary-color); }
+        .btn-show:active { background: #fca5a5; }
 
-        /* 全螢幕大字 Modal */
-        .modal {
+        /* 🎯 精緻化亮牌對話框 (Centered Pop-up Modal) */
+        .modal-overlay {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: white;
+            top: 0; left: 0; 
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
             z-index: 999999;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 24px;
-            text-align: center;
+            justify-content: center;
+            padding: 20px;
         }
-        .modal.active { display: flex; }
-        .modal-jp { font-size: 36px; font-weight: bold; color: #000; margin-bottom: 16px; word-break: break-all; }
-        .modal-zh { font-size: 20px; color: #666; margin-bottom: 32px; }
-        .modal-close {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: #eee;
+        .modal-overlay.active { display: flex; }
+
+        .modal-box {
+            background: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 24px 20px 20px 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: modalFadeIn 0.25s ease-out;
+            position: relative;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-badge {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-jp {
+            font-size: 28px;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1.3;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+
+        .modal-zh {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
             border: none;
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            font-size: 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
         }
+        .modal-btn-speak { background: #f3f4f6; color: var(--secondary-color); }
+        .modal-btn-close { background: var(--secondary-color); color: white; }
     </style>
 </head>
 <body>
 
-    <h2>🗣️ 現場日語指談助手</h2>
+    <div class="header">
+        <h2>🗣️ 現場日語指談助手</h2>
+        <p>點選「亮牌」可彈出卡片直接秀給店員看</p>
+    </div>
 
-    <input type="text" id="searchInput" class="search-box" placeholder="搜尋關鍵字 (例：袋子、退稅、信用卡)..." oninput="filterCards()">
+    <input type="text" id="searchInput" class="search-box" placeholder="搜尋中文 / 日文 / 拼音 (例: 塑膠袋, 退稅)..." oninput="filterCards()">
 
     <div class="tags-container" id="tagsContainer">
         <button class="tag-btn active" onclick="filterTag('全部', this)">全部</button>
-        <button class="tag-btn" onclick="filterTag('結帳/便利商店', this)">🏪 結帳/超商</button>
-        <button class="tag-btn" onclick="filterTag('支付方式', this)">💳 支付方式</button>
+        <button class="tag-btn" onclick="filterTag('結帳/超商', this)">🏪 結帳/超商</button>
+        <button class="tag-btn" onclick="filterTag('支付/結帳', this)">💳 支付/結帳</button>
         <button class="tag-btn" onclick="filterTag('退稅/購物', this)">🛍️ 退稅/購物</button>
         <button class="tag-btn" onclick="filterTag('餐廳/點餐', this)">🍜 餐廳/點餐</button>
+        <button class="tag-btn" onclick="filterTag('飯店/交通', this)">🏨 飯店/交通</button>
     </div>
 
     <div class="card-grid" id="cardGrid"></div>
 
-    <!-- 大字顯示Modal -->
-    <div class="modal" id="showModal">
-        <button class="modal-close" onclick="closeModal()">✕</button>
-        <div class="modal-jp" id="modalJp"></div>
-        <div class="modal-zh" id="modalZh"></div>
-        <button class="action-btn btn-speak" style="padding: 12px 24px; font-size: 16px;" onclick="speakCurrentModal()">🔊 播放發音</button>
+    <!-- 🎯 改善後的彈窗 Modal -->
+    <div class="modal-overlay" id="showModal" onclick="bgCloseModal(event)">
+        <div class="modal-box">
+            <div class="modal-badge">店員さんへ (請看這裡)</div>
+            <div class="modal-jp" id="modalJp"></div>
+            <div class="modal-zh" id="modalZh"></div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-speak" onclick="speakCurrentModal()">🔊 播放發音</button>
+                <button class="modal-btn modal-btn-close" onclick="closeModal()">關閉</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const cardData = [
-            { category: "結帳/便利商店", jp: "袋はいりません。", roma: "Fukuro wa irimasen.", zh: "不用塑膠袋" },
-            { category: "結帳/便利商店", jp: "袋を1枚お願いします。", roma: "Fukuro wo ichimai onegaishimasu.", zh: "需要買一個袋子" },
-            { category: "結帳/便利商店", jp: "温めてください。", roma: "Atatame te kudasai.", zh: "請幫我微波加熱" },
-            { category: "結帳/便利商店", jp: "お箸をください。", roma: "Ohashi wo kudasai.", zh: "請給我筷子" },
-            { category: "支付方式", jp: "タッチ決済でお願いします。", roma: "Touch kessai de onegaishimasu.", zh: "使用信用卡感應支付" },
-            { category: "支付方式", jp: "交通系ICで払います。", roma: "Koutsuukei IC de haraimasu.", zh: "使用 Suica/IC 卡支付" },
-            { category: "支付方式", jp: "一括払いでお願いします。", roma: "Ikkatsu barai de onegaishimasu.", zh: "信用卡一次付清" },
-            { category: "退稅/購物", jp: "免税処理はできますか？", roma: "Menzei shori wa dekimasu ka?", zh: "請問可以辦理退稅嗎？" },
+            // 🏪 結帳/超商
+            { category: "結帳/超商", jp: "袋はいりません。", roma: "Fukuro wa irimasen.", zh: "不用塑膠袋" },
+            { category: "結帳/超商", jp: "袋を1枚お願いします。", roma: "Fukuro wo ichimai onegaishimasu.", zh: "請給我一個塑膠袋" },
+            { category: "結帳/超商", jp: "温めてください。", roma: "Atatame te kudasai.", zh: "請幫我微波加熱" },
+            { category: "結帳/超商", jp: "お箸 / スプーンをください。", roma: "Ohashi / Supuun wo kudasai.", zh: "請給我筷子 / 湯匙" },
+            { category: "結帳/超商", jp: "分け袋をお願いします。", roma: "Wake fukuro wo onegaishimasu.", zh: "請幫我分開裝袋" },
+            { category: "結帳/超商", jp: "レシートをください。", roma: "Reshiito wo kudasai.", zh: "請給我收據" },
+
+            // 💳 支付/結帳
+            { category: "支付/結帳", jp: "タッチ決済でお願いします。", roma: "Touch kessai de onegaishimasu.", zh: "使用信用卡感應支付 (Apple Pay)" },
+            { category: "支付/結帳", jp: "交通系ICで払います。", roma: "Koutsuukei IC de haraimasu.", zh: "使用 Suica / PASMO 支付" },
+            { category: "支付/結帳", jp: "クレジットカードで払います。", roma: "Kreditto kaado de haraimasu.", zh: "使用信用卡（插卡）" },
+            { category: "支付/結帳", jp: "一括払いでお願いします。", roma: "Ikkatsu barai de onegaishimasu.", zh: "信用卡一次付清" },
+            { category: "支付/結帳", jp: "PayPay / LINE Payで払います。", roma: "PayPay de haraimasu.", zh: "使用掃碼支付 (PayPay/LINE Pay)" },
+            { category: "支付/結帳", jp: "現金で払います。", roma: "Genkin de haraimasu.", zh: "用現金支付" },
+
+            // 🛍️ 退稅/購物
+            { category: "退稅/購物", jp: "免税処理はできますか？", roma: "Menzei shori wa dekimasu ka?", zh: "請問這裡可以辦理退稅嗎？" },
             { category: "退稅/購物", jp: "パスポートはこちらです。", roma: "Pasupooto wa kochira desu.", zh: "這是我的護照" },
+            { category: "退稅/購物", jp: "試着してもいいですか？", roma: "Shichaku shitemo ii desu ka?", zh: "請問可以試穿嗎？" },
+            { category: "退稅/購物", jp: "新しい在庫はありますか？", roma: "Atarashii zaiko wa arimasu ka?", zh: "請問有新的現貨嗎？" },
+            { category: "退稅/購物", jp: "別のサイズはありますか？", roma: "Betsu no saizu wa arimasu ka?", zh: "請問有其他尺寸嗎？" },
+
+            // 🍜 餐廳/點餐
             { category: "餐廳/點餐", jp: "おすすめは何ですか？", roma: "Osume wa nan desu ka?", zh: "請問有推薦的餐點嗎？" },
             { category: "餐廳/點餐", jp: "店内利用でお願いします。", roma: "Tennaide onegaishimasu.", zh: "內用" },
             { category: "餐廳/點餐", jp: "持ち帰りでお願いします。", roma: "Mochikaeri de onegaishimasu.", zh: "外帶" },
-            { category: "餐廳/點餐", jp: "お会計をお願いします。", roma: "Okaikei wo onegaishimasu.", zh: "麻煩請幫我結帳" }
+            { category: "餐廳/點餐", jp: "氷なし / ネギ抜きで。", roma: "Koori nashi / Negi nuki de.", zh: "去冰 / 不加蔥" },
+            { category: "餐廳/點餐", jp: "牛肉は食べられません。", roma: "Gyuuniku wa taberaremasen.", zh: "我不吃牛肉" },
+            { category: "餐廳/點餐", jp: "注文は以上です。", roma: "Chuumon wa ijou desu.", zh: "點餐完畢（就這些）" },
+            { category: "餐廳/點餐", jp: "お会計をお願いします。", roma: "Okaikei wo onegaishimasu.", zh: "麻煩請幫我結帳" },
+            { category: "餐廳/點餐", jp: "別々で払えますか？", roma: "Betsubetsu de haraemasu ka?", zh: "可以分開結帳嗎？" },
+
+            // 🏨 飯店/交通
+            { category: "飯店/交通", jp: "荷物を預かってもらえますか？", roma: "Nimotsu wo azukatte moraemasu ka?", zh: "請問可以先寄放行李嗎？" },
+            { category: "飯店/交通", jp: "チェックインをお願いします。", roma: "Chekkuin wo onegaishimasu.", zh: "辦理 Check-in 入住" },
+            { category: "飯店/交通", jp: "タクシーを呼んでいただけますか？", roma: "Takushii wo yonde itadakemasu ka?", zh: "請問可以幫忙叫計程車嗎？" },
+            { category: "飯店/交通", jp: "ここに行きたいです。", roma: "Koko ni ikitai desu.", zh: "我想去這個地方（配地圖秀給他看）" }
         ];
 
         let currentTag = "全部";
@@ -206,7 +316,7 @@
                     card.className = 'card';
                     card.innerHTML = `
                         <div>
-                            <div class="card-header"><span>${item.category}</span></div>
+                            <div class="card-category">${item.category}</div>
                             <div class="card-jp">${item.jp}</div>
                             <div class="card-roma">${item.roma}</div>
                             <div class="card-zh">${item.zh}</div>
@@ -237,10 +347,10 @@
                 window.speechSynthesis.cancel();
                 const utter = new SpeechSynthesisUtterance(text);
                 utter.lang = 'ja-JP';
-                utter.rate = 0.9;
+                utter.rate = 0.85; // 稍微放慢語速更清晰
                 window.speechSynthesis.speak(utter);
             } else {
-                alert('您的瀏覽器不支援語音播放功能');
+                alert('您的裝置或瀏覽器不支援語音播放功能');
             }
         }
 
@@ -253,14 +363,20 @@
 
         function closeModal() {
             document.getElementById('showModal').classList.remove('active');
-            window.speechSynthesis.cancel();
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        }
+
+        function bgCloseModal(event) {
+            if (event.target.id === 'showModal') {
+                closeModal();
+            }
         }
 
         function speakCurrentModal() {
             if (currentModalText) speakText(currentModalText);
         }
 
-        // 預設渲染
+        // 初始化
         renderCards();
     </script>
 </body>
