@@ -54,7 +54,7 @@
             margin-bottom: 4px;
         }
 
-        input, select {
+        input[type="text"], input[type="number"], select {
             width: 100%;
             padding: 8px 10px;
             border: 1px solid #ccc;
@@ -69,7 +69,6 @@
             gap: 10px;
         }
 
-        /* 輸入時的即時台幣預覽卡片 */
         .live-calc-preview {
             background: #edf2f4;
             border-left: 4px solid var(--primary);
@@ -105,7 +104,6 @@
 
         button:active { opacity: 0.8; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-secondary { background: var(--secondary); color: white; }
         .btn-outline { background: transparent; border: 1px solid #ccc; color: #555; }
         .btn-danger { background: #d90429; color: white; }
 
@@ -118,12 +116,37 @@
             border-radius: 8px;
         }
 
+        /* 清單控制工具列 */
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5px 10px 5px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            color: #457b9d;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
         .item-list {
             list-style: none;
             padding: 0;
             margin: 0;
         }
 
+        /* 品項卡片與狀態 */
         .item-card {
             background: var(--card-bg);
             padding: 12px 15px;
@@ -131,11 +154,38 @@
             margin-bottom: 8px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 10px;
+            transition: opacity 0.3s, background-color 0.3s;
         }
 
-        .item-info { font-size: 0.95rem; }
+        /* 已購買狀態：顏色變淡、刪除線 */
+        .item-card.purchased {
+            opacity: 0.45;
+            background-color: #f1f3f5;
+        }
+        .item-card.purchased .item-name {
+            text-decoration: line-through;
+        }
+
+        .item-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border-right: 1px solid #eee;
+            padding-right: 10px;
+        }
+
+        .item-checkboxes label {
+            margin: 0;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .item-info { flex: 1; font-size: 0.95rem; }
         .item-info strong { display: block; color: #1d3557; }
         .item-info span { font-size: 0.8rem; color: #777; }
         .item-price { text-align: right; }
@@ -150,7 +200,7 @@
             margin-top: 15px;
             text-align: center;
         }
-        .total-box h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
+        .total-box h3 { margin: 0 0 5px 0; font-size: 1rem; opacity: 0.9; }
         .total-box .price-large { font-size: 1.8rem; font-weight: bold; color: #4cc9f0; }
 
         #import-file { display: none; }
@@ -178,7 +228,7 @@
         </div>
     </div>
 
-    <!-- 新增品項 (每個品項獨立設定稅率) -->
+    <!-- 新增品項 -->
     <div class="card">
         <div class="form-group">
             <label for="item-name">商品名稱 / 店名</label>
@@ -196,7 +246,6 @@
             </div>
         </div>
 
-        <!-- 稅率選單移至單品項輸入區 -->
         <div class="form-group">
             <label for="item-tax">適用消費稅率 / 免稅</label>
             <select id="item-tax" onchange="updateLivePreview()">
@@ -206,7 +255,7 @@
             </select>
         </div>
 
-        <!-- 輸入期間即時計算預覽 (跳台幣價) -->
+        <!-- 即時計算預覽卡片 -->
         <div class="live-calc-preview">
             <span>折後含稅日幣: <span id="preview-jpy">¥ 0</span></span>
             <span>約合台幣: <strong id="preview-twd">NT$ 0</strong></span>
@@ -217,12 +266,20 @@
         </div>
     </div>
 
+    <!-- 清單控制項（包含全選切換） -->
+    <div class="list-header">
+        <strong style="color: #1d3557;">購物清單</strong>
+        <label class="checkbox-label">
+            <input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)"> 全選 (計算全趟行程總額)
+        </label>
+    </div>
+
     <!-- 清單顯示區 -->
     <ul class="item-list" id="item-list"></ul>
 
     <!-- 總計區 -->
     <div class="total-box">
-        <h3>預估結帳總額</h3>
+        <h3 id="total-title">預估結帳金額 (已選取品項)</h3>
         <div class="price-large" id="total-twd">約 NT$ 0</div>
         <div id="total-jpy" style="opacity: 0.8; font-size:0.9rem; margin-top:4px;">(總計 ¥ 0)</div>
     </div>
@@ -234,7 +291,6 @@
         items: []
     };
 
-    // 讀取 LocalStorage
     function loadData() {
         const saved = localStorage.getItem('shopping_calculator_data');
         if (saved) {
@@ -247,13 +303,11 @@
         }
     }
 
-    // 儲存至 LocalStorage
     function saveData() {
         state.rate = parseFloat(document.getElementById('rate').value) || 0.21;
         localStorage.setItem('shopping_calculator_data', JSON.stringify(state));
     }
 
-    // 🎯 輸入期間即時計算預覽 (跳台幣金額)
     function updateLivePreview() {
         const rate = parseFloat(document.getElementById('rate').value) || 0;
         const rawPrice = parseFloat(document.getElementById('item-price').value) || 0;
@@ -268,7 +322,6 @@
         document.getElementById('preview-twd').innerText = `NT$ ${finalTWD.toLocaleString()}`;
     }
 
-    // 🎯 新增品項：將「當下選取的稅率與計算結果」鎖定存入物件
     function addItem() {
         const nameInput = document.getElementById('item-name');
         const priceInput = document.getElementById('item-price');
@@ -285,7 +338,6 @@
             return;
         }
 
-        // 稅率名稱標記
         let taxLabel = '免稅';
         if (taxRate === 1.10) taxLabel = '10%';
         if (taxRate === 1.08) taxLabel = '8%';
@@ -295,8 +347,10 @@
             name: name,
             price: rawPrice,
             discount: discount,
-            taxRate: taxRate,   // 獨立鎖定品項稅率
-            taxLabel: taxLabel
+            taxRate: taxRate,
+            taxLabel: taxLabel,
+            inCart: true,      // 預設加入購物車（參與試算）
+            purchased: false   // 預設未購買
         });
 
         saveData();
@@ -308,14 +362,31 @@
         updateLivePreview();
     }
 
-    // 刪除品項
+    // 切換單一品項的勾選狀態
+    function toggleStatus(id, key) {
+        const item = state.items.find(i => i.id === id);
+        if (item) {
+            item[key] = !item[key];
+            saveData();
+            render();
+        }
+    }
+
+    // 全選 / 取消全選（讓所有商品加入購物車）
+    function toggleSelectAll(checked) {
+        state.items.forEach(item => {
+            item.inCart = checked;
+        });
+        saveData();
+        render();
+    }
+
     function deleteItem(id) {
         state.items = state.items.filter(item => item.id !== id);
         saveData();
         render();
     }
 
-    // 渲染列表
     function render() {
         saveData();
         const listEl = document.getElementById('item-list');
@@ -324,29 +395,56 @@
         let totalJPY = 0;
         let totalTWD = 0;
 
+        // 檢查是否所有品項都被勾選入購物車
+        const selectAllCheckbox = document.getElementById('select-all');
+        if (state.items.length > 0) {
+            selectAllCheckbox.checked = state.items.every(item => item.inCart);
+        } else {
+            selectAllCheckbox.checked = false;
+        }
+
         state.items.forEach(item => {
             const discountedPrice = item.price * (item.discount / 100);
             const finalJPY = Math.round(discountedPrice * (item.taxRate || 1.0));
             const finalTWD = Math.round(finalJPY * state.rate);
             
-            totalJPY += finalJPY;
-            totalTWD += finalTWD;
+            // 只有「加入購物車」勾選的品項才納入金額統計
+            if (item.inCart) {
+                totalJPY += finalJPY;
+                totalTWD += finalTWD;
+            }
 
             const li = document.createElement('li');
-            li.className = 'item-card';
+            li.className = `item-card ${item.purchased ? 'purchased' : ''}`;
             li.innerHTML = `
+                <div class="item-checkboxes">
+                    <label>
+                        <input type="checkbox" ${item.inCart ? 'checked' : ''} onchange="toggleStatus(${item.id}, 'inCart')"> 試算
+                    </label>
+                    <label>
+                        <input type="checkbox" ${item.purchased ? 'checked' : ''} onchange="toggleStatus(${item.id}, 'purchased')"> 已買
+                    </label>
+                </div>
                 <div class="item-info">
-                    <strong>${escapeHtml(item.name)}</strong>
+                    <strong class="item-name">${escapeHtml(item.name)}</strong>
                     <span>原價 ¥${item.price.toLocaleString()} | ${item.discount < 100 ? `${item.discount}折` : '無折扣'} | 稅率: ${item.taxLabel}</span>
                 </div>
                 <div class="item-price">
                     <div class="twd">約 NT$ ${finalTWD.toLocaleString()}</div>
                     <div class="jpy">¥ ${finalJPY.toLocaleString()}</div>
                 </div>
-                <button class="btn-danger" style="flex:none; padding: 6px 10px; margin-left:10px;" onclick="deleteItem(${item.id})">🗑️</button>
+                <button class="btn-danger" style="flex:none; padding: 6px 10px; margin-left:5px;" onclick="deleteItem(${item.id})">🗑️</button>
             `;
             listEl.appendChild(li);
         });
+
+        // 動態調整總結區文字標題
+        const totalTitleEl = document.getElementById('total-title');
+        if (selectAllCheckbox.checked && state.items.length > 0) {
+            totalTitleEl.innerText = "全趟行程所有商品總額 (全選)";
+        } else {
+            totalTitleEl.innerText = "預估結帳金額 (已選取試算品項)";
+        }
 
         document.getElementById('total-jpy').innerText = `(總計 ¥ ${totalJPY.toLocaleString()})`;
         document.getElementById('total-twd').innerText = `約 NT$ ${totalTWD.toLocaleString()}`;
@@ -358,7 +456,6 @@
         });
     }
 
-    // 📥 匯出 JSON (檔名帶當天日期)
     function exportJSON() {
         saveData();
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
@@ -371,7 +468,6 @@
         downloadAnchor.remove();
     }
 
-    // 📤 匯入 JSON
     function importJSON(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -398,7 +494,6 @@
         event.target.value = '';
     }
 
-    // 初始化
     loadData();
     render();
     updateLivePreview();
