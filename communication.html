@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>現場日語指談助手</title>
+    <style>
+        :root {
+            --primary: #e63946;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2b2d42;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 16px;
+            padding-bottom: 40px;
+        }
+
+        h2 { margin-top: 0; color: #1d3557; display: flex; align-items: center; gap: 8px; }
+        
+        /* 搜尋與篩選列 */
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 12px;
+            outline: none;
+        }
+        .search-box:focus { border-color: var(--primary); }
+
+        .tags-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tag-btn {
+            background: #e9ecef;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            color: #495057;
+        }
+        .tag-btn.active {
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* 卡片網格 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-header {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .card-jp {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1d3557;
+            margin-bottom: 4px;
+        }
+        .card-roma {
+            font-size: 13px;
+            color: #e63946;
+            margin-bottom: 8px;
+        }
+        .card-zh {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .btn-speak { background: #e8f4f8; color: #1d3557; }
+        .btn-show { background: #ffe3e3; color: var(--primary); font-weight: bold; }
+
+        /* 全螢幕大字 Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: white;
+            z-index: 999999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+        .modal.active { display: flex; }
+        .modal-jp { font-size: 36px; font-weight: bold; color: #000; margin-bottom: 16px; word-break: break-all; }
+        .modal-zh { font-size: 20px; color: #666; margin-bottom: 32px; }
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: #eee;
+            border: none;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🗣️ 現場日語指談助手</h2>
+
+    <input type="text" id="searchInput" class="search-box" placeholder="搜尋關鍵字 (例：袋子、退稅、信用卡)..." oninput="filterCards()">
+
+    <div class="tags-container" id="tagsContainer">
+        <button class="tag-btn active" onclick="filterTag('全部', this)">全部</button>
+        <button class="tag-btn" onclick="filterTag('結帳/便利商店', this)">🏪 結帳/超商</button>
+        <button class="tag-btn" onclick="filterTag('支付方式', this)">💳 支付方式</button>
+        <button class="tag-btn" onclick="filterTag('退稅/購物', this)">🛍️ 退稅/購物</button>
+        <button class="tag-btn" onclick="filterTag('餐廳/點餐', this)">🍜 餐廳/點餐</button>
+    </div>
+
+    <div class="card-grid" id="cardGrid"></div>
+
+    <!-- 大字顯示Modal -->
+    <div class="modal" id="showModal">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-jp" id="modalJp"></div>
+        <div class="modal-zh" id="modalZh"></div>
+        <button class="action-btn btn-speak" style="padding: 12px 24px; font-size: 16px;" onclick="speakCurrentModal()">🔊 播放發音</button>
+    </div>
+
+    <script>
+        const cardData = [
+            { category: "結帳/便利商店", jp: "袋はいりません。", roma: "Fukuro wa irimasen.", zh: "不用塑膠袋" },
+            { category: "結帳/便利商店", jp: "袋を1枚お願いします。", roma: "Fukuro wo ichimai onegaishimasu.", zh: "需要買一個袋子" },
+            { category: "結帳/便利商店", jp: "温めてください。", roma: "Atatame te kudasai.", zh: "請幫我微波加熱" },
+            { category: "結帳/便利商店", jp: "お箸をください。", roma: "Ohashi wo kudasai.", zh: "請給我筷子" },
+            { category: "支付方式", jp: "タッチ決済でお願いします。", roma: "Touch kessai de onegaishimasu.", zh: "使用信用卡感應支付" },
+            { category: "支付方式", jp: "交通系ICで払います。", roma: "Koutsuukei IC de haraimasu.", zh: "使用 Suica/IC 卡支付" },
+            { category: "支付方式", jp: "一括払いでお願いします。", roma: "Ikkatsu barai de onegaishimasu.", zh: "信用卡一次付清" },
+            { category: "退稅/購物", jp: "免税処理はできますか？", roma: "Menzei shori wa dekimasu ka?", zh: "請問可以辦理退稅嗎？" },
+            { category: "退稅/購物", jp: "パスポートはこちらです。", roma: "Pasupooto wa kochira desu.", zh: "這是我的護照" },
+            { category: "餐廳/點餐", jp: "おすすめは何ですか？", roma: "Osume wa nan desu ka?", zh: "請問有推薦的餐點嗎？" },
+            { category: "餐廳/點餐", jp: "店内利用でお願いします。", roma: "Tennaide onegaishimasu.", zh: "內用" },
+            { category: "餐廳/點餐", jp: "持ち帰りでお願いします。", roma: "Mochikaeri de onegaishimasu.", zh: "外帶" },
+            { category: "餐廳/點餐", jp: "お会計をお願いします。", roma: "Okaikei wo onegaishimasu.", zh: "麻煩請幫我結帳" }
+        ];
+
+        let currentTag = "全部";
+        let currentModalText = "";
+
+        function renderCards() {
+            const grid = document.getElementById('cardGrid');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            grid.innerHTML = '';
+
+            cardData.forEach(item => {
+                const matchTag = (currentTag === "全部" || item.category === currentTag);
+                const matchSearch = item.zh.toLowerCase().includes(search) || 
+                                    item.jp.toLowerCase().includes(search) || 
+                                    item.roma.toLowerCase().includes(search);
+
+                if (matchTag && matchSearch) {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div>
+                            <div class="card-header"><span>${item.category}</span></div>
+                            <div class="card-jp">${item.jp}</div>
+                            <div class="card-roma">${item.roma}</div>
+                            <div class="card-zh">${item.zh}</div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn btn-speak" onclick="speakText('${item.jp}')">🔊 發音</button>
+                            <button class="action-btn btn-show" onclick="showBigText('${item.jp}', '${item.zh}')">📱 亮牌</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+        }
+
+        function filterTag(tag, btn) {
+            currentTag = tag;
+            document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderCards();
+        }
+
+        function filterCards() {
+            renderCards();
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'ja-JP';
+                utter.rate = 0.9;
+                window.speechSynthesis.speak(utter);
+            } else {
+                alert('您的瀏覽器不支援語音播放功能');
+            }
+        }
+
+        function showBigText(jp, zh) {
+            currentModalText = jp;
+            document.getElementById('modalJp').innerText = jp;
+            document.getElementById('modalZh').innerText = zh;
+            document.getElementById('showModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('showModal').classList.remove('active');
+            window.speechSynthesis.cancel();
+        }
+
+        function speakCurrentModal() {
+            if (currentModalText) speakText(currentModalText);
+        }
+
+        // 預設渲染
+        renderCards();
+    </script>
+</body>
+</html>
