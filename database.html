@@ -478,6 +478,21 @@
             }
         }
 
+        // 功能：導出 JSON 檔案（自動帶出當天日期）
+        function exportJSON() {
+            // 取得當前日期 (格式: YYYY-MM-DD)
+            const today = new Date().toISOString().slice(0, 10);
+            const fileName = `japan_trip_backup_${today}.json`;
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tripData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+        /*
         // 功能：導出 JSON 檔案
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tripData, null, 2));
@@ -488,7 +503,7 @@
             downloadAnchor.click();
             downloadAnchor.remove();
         }
-
+        */
         // 功能：導入 JSON 檔案
         function importJSON(event) {
             const file = event.target.files[0];
@@ -515,6 +530,34 @@
             reader.readAsText(file);
             event.target.value = '';
         }
+        /*
+        // 功能：導入 JSON 檔案
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        if (confirm("匯入成功！是否要覆蓋目前瀏覽器的資料？")) {
+                            tripData = importedData;
+                            editingItemId = null;
+                            saveToLocal();
+                            render();
+                        }
+                    } else {
+                        alert("檔案格式不正確，匯入失敗。");
+                    }
+                } catch (err) {
+                    alert("讀取檔案時發生錯誤，請確保它是合法的 JSON 檔案。");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+        */
 
         // 啟動
         init();
