@@ -171,6 +171,14 @@
             const iframe = document.getElementById('tool-runner');
             iframe.src = './handbook.html';
         });
+        // 🎯 註冊 PWA Service Worker，確保 100% 離線可用        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('離線快取成功！', reg))
+                    .catch(err => console.log('離線快取失敗：', err));
+            });
+        }
     </script>
 </body>
 </html>
