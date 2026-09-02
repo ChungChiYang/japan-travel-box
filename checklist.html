@@ -31,7 +31,31 @@
             text-align: center;
             color: #1d3557;
             margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        /* 匯入匯出按鈕區塊 */
+        .io-actions {
+            display: flex;
+            gap: 10px;
             margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .btn-io {
+            background: #e9ecef;
+            color: #495057;
+            border: 1px solid #ced4da;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            width: auto;
+            font-weight: normal;
+        }
+
+        .btn-io:hover {
+            background: #dee2e6;
         }
 
         .card {
@@ -169,6 +193,13 @@
 <div class="container">
     <h2>📋 日本行預買清單 (Checklist)</h2>
 
+    <!-- 匯入 / 匯出 按鈕列 -->
+    <div class="io-actions">
+        <button class="btn-io" onclick="exportJSON()">📤 匯出 JSON</button>
+        <button class="btn-io" onclick="document.getElementById('import-file').click()">📥 匯入 JSON</button>
+        <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importJSON(event)">
+    </div>
+
     <!-- 新增願望卡片 -->
     <div class="card">
         <div class="form-group">
@@ -225,6 +256,54 @@
 
     function saveWishlist() {
         localStorage.setItem('japan_wishlist_data', JSON.stringify(wishlist));
+    }
+
+    // 匯出 JSON 功能
+    function exportJSON() {
+        if (wishlist.length === 0) {
+            alert('目前的預買清單是空的，無法匯出。');
+            return;
+        }
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(wishlist, null, 2));
+        const downloadAnchor = document.createElement('a');
+        const today = new Date().toISOString().slice(0, 10);
+        
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `japan_wishlist_${today}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    // 匯入 JSON 功能
+    function importJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (!Array.isArray(importedData)) {
+                    alert('匯入失敗：格式不正確，必須是 JSON 陣列資料。');
+                    return;
+                }
+
+                if (confirm(`確定要匯入 ${importedData.length} 個項目嗎？這將會覆蓋現有的清單。`)) {
+                    wishlist = importedData;
+                    saveWishlist();
+                    render();
+                    alert('匯入成功！');
+                }
+            } catch (err) {
+                alert('JSON 解析失敗，請確認檔案格式是否正確。');
+                console.error(err);
+            }
+            // 重置 input 以利重複選擇同名檔案
+            event.target.value = '';
+        };
+        reader.readAsText(file);
     }
 
     // 校正 sentToCalc 與 purchased 狀態
