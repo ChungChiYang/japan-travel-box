@@ -389,6 +389,21 @@
         });
     }
 
+    // 1. 當分頁切換回願望清單（Tab 變為可見）時，自動重新讀取並渲染
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            loadWishlist();
+            render();
+        }
+    });
+
+    // 2. 當視窗重新獲得焦點時同步
+    window.addEventListener('focus', function() {
+        loadWishlist();
+        render();
+    });
+
+    // 頁面首次載入
     loadWishlist();
     render();
 </script>
