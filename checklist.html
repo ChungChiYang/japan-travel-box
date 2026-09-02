@@ -153,15 +153,6 @@
             align-items: center;
         }
 
-        .nav-link {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: #457b9d;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
         .tag-sent {
             font-size: 0.75rem;
             color: #2a9d8f;
@@ -213,8 +204,6 @@
 
     <!-- 清單顯示區 -->
     <div id="checklist-container"></div>
-
-    
 </div>
 
 <script>
@@ -229,17 +218,51 @@
                 console.error("願望清單解析失敗", e);
             }
         }
+
+        // 檢查計算器中的狀態，若計算器中的項目已被刪除，校正 sentToCalc 狀態
+        syncStatusWithCalc();
     }
 
     function saveWishlist() {
         localStorage.setItem('japan_wishlist_data', JSON.stringify(wishlist));
     }
 
+    // 校正 sentToCalc 與 purchased 狀態
+    function syncStatusWithCalc() {
+        const savedCalc = localStorage.getItem('shopping_calculator_data');
+        if (!savedCalc) return;
+
+        try {
+            const calcState = JSON.parse(savedCalc);
+            if (!Array.isArray(calcState.items)) return;
+
+            wishlist.forEach(item => {
+                const targetCalcItem = calcState.items.find(i => 
+                    i.wishlistId === item.id || i.rawWishName === item.name
+                );
+
+                if (targetCalcItem) {
+                    item.done = targetCalcItem.purchased; // 自動同步已買狀態
+                    item.sentToCalc = true;
+                } else {
+                    // 若計算器中沒有此 ID/名稱，表示被刪除或未帶入
+                    item.sentToCalc = false;
+                }
+            });
+        } catch (e) {
+            console.error("同步狀態校正失敗", e);
+        }
+    }
+
     function addWishItem() {
         const cat = document.getElementById('wish-cat').value;
-        const name = document.getElementById('wish-name').value.trim();
-        const qty = parseInt(document.getElementById('wish-qty').value) || 1;
-        const note = document.getElementById('wish-note').value.trim();
+        const nameInput = document.getElementById('wish-name');
+        const qtyInput = document.getElementById('wish-qty');
+        const noteInput = document.getElementById('wish-note');
+
+        const name = nameInput.value.trim();
+        const qty = parseInt(qtyInput.value) || 1;
+        const note = noteInput.value.trim();
 
         if (!name) {
             alert('請輸入商品名稱');
@@ -259,9 +282,10 @@
         saveWishlist();
         render();
 
-        document.getElementById('wish-name').value = '';
-        document.getElementById('wish-qty').value = '1';
-        document.getElementById('wish-note').value = '';
+        nameInput.value = '';
+        qtyInput.value = '1';
+        noteInput.value = '';
+        nameInput.focus();
     }
 
     function toggleDone(id) {
@@ -271,13 +295,11 @@
             saveWishlist();
             render();
 
-            // ----------------- 正向同步至購物速算 (calculator.html) -----------------
+            // 正向同步至購物速算
             const savedCalc = localStorage.getItem('shopping_calculator_data');
             if (savedCalc) {
                 try {
                     let calcState = JSON.parse(savedCalc);
-                
-                    // 尋找速算清單中對應的商品（透過 wishlistId 或名稱比對）
                     const targetCalcItem = calcState.items.find(i => 
                         i.wishlistId === item.id || i.rawWishName === item.name
                     );
@@ -290,13 +312,33 @@
                     console.error("同步至速算清單失敗", e);
                 }
             }
-        // ---------------------------------------------------------------------
         }
     }
 
     function deleteWish(id) {
+        const item = wishlist.find(i => i.id === id);
+        if (!item) return;
+
+        // 1. 刪除願望清單項目
         wishlist = wishlist.filter(i => i.id !== id);
         saveWishlist();
+
+        // 2. 同步刪除速算清單中的對應項目
+        const savedCalc = localStorage.getItem('shopping_calculator_data');
+        if (savedCalc) {
+            try {
+                let calcState = JSON.parse(savedCalc);
+                if (Array.isArray(calcState.items)) {
+                    calcState.items = calcState.items.filter(i => 
+                        i.wishlistId !== id && i.rawWishName !== item.name
+                    );
+                    localStorage.setItem('shopping_calculator_data', JSON.stringify(calcState));
+                }
+            } catch (e) {
+                console.error("刪除速算對應項目失敗", e);
+            }
+        }
+
         render();
     }
 
@@ -310,6 +352,7 @@
             try { calcState = JSON.parse(savedCalc); } catch(e){}
         }
 
+        // 清理分類字串，去除 Emoji
         let cleanCat = "其他";
         if (item.category.includes("藥妝")) cleanCat = "藥妝";
         else if (item.category.includes("家電")) cleanCat = "家電";
@@ -318,17 +361,17 @@
 
         calcState.items.push({
             id: Date.now(),
-            wishlistId: item.id, // 綁定原本願望清單的 ID
+            wishlistId: item.id,
             category: cleanCat,
             name: item.name + (item.note ? ` (${item.note})` : ''),
-            rawWishName: item.name, // 保留純名稱用於比對
+            rawWishName: item.name,
             price: 0,
             qty: item.qty,
             discount: 100,
             taxRate: 1.0,
             taxLabel: '免稅',
             inCart: true,
-            purchased: false
+            purchased: item.done
         });
 
         localStorage.setItem('shopping_calculator_data', JSON.stringify(calcState));
@@ -339,7 +382,7 @@
     }
 
     function render() {
-        loadWishlist(); // 每次渲染時重新讀取最新狀態（包含來自計算器的勾選同步）
+        loadWishlist(); // 每次渲染前自動整合最新狀態
         const container = document.getElementById('checklist-container');
         container.innerHTML = '';
 
@@ -366,7 +409,7 @@
             items.forEach(item => {
                 let actionBtnHtml = '';
                 if (item.sentToCalc) {
-                    actionBtnHtml = `<button class="btn-send sent" disabled>已帶入 ✓</button>`;
+                    actionBtnHtml = `<button class="btn-send sent" disabled title="已帶入購物速算試算">已帶入 ✓</button>`;
                 } else if (item.done) {
                     actionBtnHtml = `<button class="btn-send sent" disabled title="已購買項目無需帶入">已買 ✓</button>`;
                 } else {
@@ -410,22 +453,18 @@
         });
     }
 
-    // 1. 當分頁切換回願望清單（Tab 變為可見）時，自動重新讀取並渲染
+    // 視窗焦點與切換事件監聽
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
-            loadWishlist();
             render();
         }
     });
 
-    // 2. 當視窗重新獲得焦點時同步
     window.addEventListener('focus', function() {
-        loadWishlist();
         render();
     });
 
-    // 頁面首次載入
-    loadWishlist();
+    // 頁面初始化
     render();
 </script>
 
