@@ -106,6 +106,7 @@
         .btn-primary { background: var(--primary); color: white; }
         .btn-outline { background: transparent; border: 1px solid #ccc; color: #555; }
         .btn-danger { background: #d90429; color: white; }
+        .btn-edit { background: #457b9d; color: white; }
 
         .backup-bar {
             display: flex;
@@ -153,7 +154,7 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: opacity 0.3s, background-color 0.3s;
         }
 
@@ -201,6 +202,13 @@
         .item-price .twd { font-size: 1rem; font-weight: bold; color: #1d3557; }
         .item-price .jpy { font-size: 0.8rem; color: var(--primary); }
 
+        .item-actions {
+            display: flex;
+            gap: 4px;
+            flex: none;
+            margin-left: 5px;
+        }
+
         .total-box {
             background: #1d3557;
             color: white;
@@ -222,6 +230,28 @@
         }
 
         #import-file { display: none; }
+
+        /* Modal 編輯彈窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
     </style>
 </head>
 <body>
@@ -277,7 +307,7 @@
             </select>
         </div>
 
-        <!-- 即時計算預覽卡片（乘上數量後的總額） -->
+        <!-- 即時計算預覽卡片 -->
         <div class="live-calc-preview">
             <span>預覽總日幣: <span id="preview-jpy">¥ 0</span></span>
             <span>約合台幣: <strong id="preview-twd">NT$ 0</strong></span>
@@ -288,7 +318,7 @@
         </div>
     </div>
 
-    <!-- 清單控制項（包含全選切換） -->
+    <!-- 清單控制項 -->
     <div class="list-header">
         <strong style="color: #1d3557;">購物清單</strong>
         <label class="checkbox-label">
@@ -305,6 +335,48 @@
         <div class="price-large" id="total-twd">約 NT$ 0</div>
         <div id="total-jpy" style="opacity: 0.8; font-size:0.9rem; margin-top:4px;">(總計 ¥ 0)</div>
         <div class="qty-summary" id="total-qty">選取件數：0 件</div>
+    </div>
+</div>
+
+<!-- 編輯彈窗 (Modal) -->
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal-content">
+        <h3 style="margin-top:0; color:#1d3557;">✏️ 編輯商品資料</h3>
+        <input type="hidden" id="edit-id">
+        
+        <div class="form-group">
+            <label for="edit-name">商品名稱 / 店名</label>
+            <input type="text" id="edit-name">
+        </div>
+
+        <div class="grid-3">
+            <div class="form-group">
+                <label for="edit-price">日幣單價</label>
+                <input type="number" id="edit-price">
+            </div>
+            <div class="form-group">
+                <label for="edit-qty">數量</label>
+                <input type="number" id="edit-qty" min="1">
+            </div>
+            <div class="form-group">
+                <label for="edit-discount">折扣 (%)</label>
+                <input type="number" id="edit-discount">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="edit-tax">適用消費稅率 / 免稅</label>
+            <select id="edit-tax">
+                <option value="1.00">免稅 0% (Tax Free / 滿額退稅)</option>
+                <option value="1.10">一般商品 10% (服飾、電器、日用)</option>
+                <option value="1.08">食品/輕稅 8% (超市外帶、零食)</option>
+            </select>
+        </div>
+
+        <div class="btn-group" style="margin-top: 15px;">
+            <button class="btn-primary" onclick="saveEdit()">💾 儲存修改</button>
+            <button class="btn-outline" onclick="closeEditModal()">取消</button>
+        </div>
     </div>
 </div>
 
@@ -390,7 +462,6 @@
         updateLivePreview();
     }
 
-    // 簡化：讓 Checkbox 狀態完全獨立，不再互斥或連動
     function toggleStatus(id, key) {
         const item = state.items.find(i => i.id === id);
         if (item) {
@@ -412,6 +483,54 @@
         state.items = state.items.filter(item => item.id !== id);
         saveData();
         render();
+    }
+
+    // 開啟編輯彈窗並填入原資料
+    function openEditModal(id) {
+        const item = state.items.find(i => i.id === id);
+        if (!item) return;
+
+        document.getElementById('edit-id').value = item.id;
+        document.getElementById('edit-name').value = item.name;
+        document.getElementById('edit-price').value = item.price;
+        document.getElementById('edit-qty').value = item.qty || 1;
+        document.getElementById('edit-discount').value = item.discount || 100;
+        document.getElementById('edit-tax').value = (item.taxRate || 1.0).toFixed(2);
+
+        document.getElementById('edit-modal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('edit-modal').style.display = 'none';
+    }
+
+    // 儲存修改後的資料
+    function saveEdit() {
+        const id = parseInt(document.getElementById('edit-id').value);
+        const item = state.items.find(i => i.id === id);
+        if (!item) return;
+
+        const rawPrice = parseFloat(document.getElementById('edit-price').value);
+        if (isNaN(rawPrice) || rawPrice <= 0) {
+            alert('請輸入有效的日幣單價');
+            return;
+        }
+
+        const taxRate = parseFloat(document.getElementById('edit-tax').value) || 1.0;
+        let taxLabel = '免稅';
+        if (taxRate === 1.10) taxLabel = '10%';
+        if (taxRate === 1.08) taxLabel = '8%';
+
+        item.name = document.getElementById('edit-name').value.trim() || '未命名商品';
+        item.price = rawPrice;
+        item.qty = parseInt(document.getElementById('edit-qty').value) || 1;
+        item.discount = parseFloat(document.getElementById('edit-discount').value) || 100;
+        item.taxRate = taxRate;
+        item.taxLabel = taxLabel;
+
+        saveData();
+        render();
+        closeEditModal();
     }
 
     function render() {
@@ -436,7 +555,7 @@
             const itemTotalJPY = Math.round(discountedUnitPrice * (item.taxRate || 1.0) * qty);
             const itemTotalTWD = Math.round(itemTotalJPY * state.rate);
             
-            // 核心規則修正：只有在「勾選試算」且「未勾選已買」時才計入總額
+            // 獨立邏輯：已買的項目不加入結算
             if (item.inCart && !item.purchased) {
                 totalJPY += itemTotalJPY;
                 totalTWD += itemTotalTWD;
@@ -462,7 +581,10 @@
                     <div class="twd">約 NT$ ${itemTotalTWD.toLocaleString()}</div>
                     <div class="jpy">¥ ${itemTotalJPY.toLocaleString()}</div>
                 </div>
-                <button class="btn-danger" style="flex:none; padding: 6px 10px; margin-left:5px;" onclick="deleteItem(${item.id})">🗑️</button>
+                <div class="item-actions">
+                    <button class="btn-edit" style="padding: 6px 8px;" onclick="openEditModal(${item.id})">✏️</button>
+                    <button class="btn-danger" style="padding: 6px 8px;" onclick="deleteItem(${item.id})">🗑️</button>
+                </div>
             `;
             listEl.appendChild(li);
         });
