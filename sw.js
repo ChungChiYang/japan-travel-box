@@ -1,4 +1,4 @@
-const CACHE_NAME = 'japan-travel-v1';
+const CACHE_NAME = 'japan-travel-v10';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
