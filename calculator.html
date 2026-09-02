@@ -821,7 +821,20 @@
         reader.readAsText(file);
         event.target.value = '';
     }
+    // --- 新增：切換分頁時自動刷資料監聽器 ---
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            loadData();
+            render();
+        }
+    });
 
+    window.addEventListener('focus', function() {
+        loadData();
+        render();
+    });
+
+    // --- 頁面首次載入初始化 ---
     loadData();
     render();
     updateLivePreview();
