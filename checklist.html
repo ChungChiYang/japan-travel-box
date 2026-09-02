@@ -270,6 +270,27 @@
             item.done = !item.done;
             saveWishlist();
             render();
+
+            // ----------------- 正向同步至購物速算 (calculator.html) -----------------
+            const savedCalc = localStorage.getItem('shopping_calculator_data');
+            if (savedCalc) {
+                try {
+                    let calcState = JSON.parse(savedCalc);
+                
+                    // 尋找速算清單中對應的商品（透過 wishlistId 或名稱比對）
+                    const targetCalcItem = calcState.items.find(i => 
+                        i.wishlistId === item.id || i.rawWishName === item.name
+                    );
+
+                    if (targetCalcItem) {
+                        targetCalcItem.purchased = item.done; // 自動更新已買狀態
+                        localStorage.setItem('shopping_calculator_data', JSON.stringify(calcState));
+                    }
+                } catch (e) {
+                    console.error("同步至速算清單失敗", e);
+                }
+            }
+        // ---------------------------------------------------------------------
         }
     }
 
