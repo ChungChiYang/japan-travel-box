@@ -806,6 +806,7 @@
     }
 
     function exportJSON() {
+        // 匯出完整的 state 物件（包含 items 陣列與匯率等設定）
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
         const downloadAnchor = document.createElement('a');
         const today = new Date().toISOString().slice(0, 10);
@@ -824,33 +825,61 @@
       reader.onload = function(e) {
         try {
           const rawData = JSON.parse(e.target.result);
-          if (Array.isArray(rawData)) {
-            // 驗證並清洗資料，補齊缺少欄位
-            items = rawData.map(item => ({
-              id: item.id || Date.now() + Math.random(),
-              name: item.name || '未命名商品',
-              category: item.category || '未分類',
-              price: Number(item.price) || 0,
-              taxRate: item.taxRate || '10',
-              discount: item.discount !== undefined ? Number(item.discount) : 1,
-              inCart: Boolean(item.inCart),
-              purchased: Boolean(item.purchased),
-              note: item.note || ''
-            }));
-        
-            saveData();
-            render();
-            alert('匯入成功！');
-          } else {
-            alert('匯入失敗：JSON 格式必須為陣列。');
+      
+          let rawItems = [];
+
+          // 判斷 1：如果傳入的是完整 state 物件 (含有 items 陣列)
+          if (rawData && typeof rawData === 'object' && Array.isArray(rawData.items)) {
+            rawItems = rawData.items;
+
+            // 如果 state 物件內有其他全域設定（如匯率或狀態），同步還原至 state
+            if (typeof state !== 'undefined' && typeof state === 'object') {
+              Object.assign(state, rawData); // 覆蓋 state 中的所有設定
+            }
+          } 
+          // 判斷 2：如果傳入的是純陣列 [...]
+          else if (Array.isArray(rawData)) {
+            rawItems = rawData;
+          } 
+          // 判斷 3：格式都不符合
+          else {
+            alert('匯入失敗：JSON 格式不正確，找不到有效的商品列表 (items)。');
+            return;
           }
+
+          // 驗證並清洗商品資料，補齊可能缺少或型態不對的欄位
+          const cleanedItems = rawItems.map(item => ({
+            id: item.id || (Date.now() + Math.random()),
+            name: item.name || '未命名商品',
+            category: item.category || '未分類',
+            price: Number(item.price) || 0,
+            taxRate: item.taxRate || '10',
+            discount: item.discount !== undefined ? Number(item.discount) : 1,
+            inCart: Boolean(item.inCart),
+            purchased: Boolean(item.purchased),
+            note: item.note || ''
+          }));
+
+          // 更新資料（依據你的變數架構：如果是 state.items 或是全域變數 items）
+          if (typeof state !== 'undefined' && state.items) {
+            state.items = cleanedItems;
+          }
+          if (typeof items !== 'undefined') {
+            items = cleanedItems;
+          }
+
+          saveData();
+          render();
+          alert('匯入成功！');
+
         } catch (err) {
+          console.error(err);
           alert('匯入失敗：無效的 JSON 檔案格式。');
         } finally {
           event.target.value = ''; // 讀取完成後重置上傳元件
         }
       };
-  
+
       reader.readAsText(file);
     }
 
