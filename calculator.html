@@ -346,7 +346,7 @@
         <div class="card">
             <div class="form-group">
                 <label for="rate">日圓匯率 (JPY ➡️ TWD)</label>
-                <input type="number" id="rate" step="0.0001" value="0.21" oninput="updateLivePreview(); render();">
+                <input type="number" id="rate" step="0.0001" value="0.21" oninput="updateRate(); updateLivePreview(); render();">
             </div>
         </div>
 
@@ -522,15 +522,20 @@
     }
 
     function saveData() {
-        state.rate = parseFloat(document.getElementById('rate').value) || 0.21;
         localStorage.setItem('shopping_calculator_data', JSON.stringify(state));
+    }
+
+    function updateRate() {
+        state.rate = parseFloat(document.getElementById('rate').value) || 0.21;
+        saveData();
     }
 
     function updateLivePreview() {
         const rate = parseFloat(document.getElementById('rate').value) || 0;
         const rawPrice = parseFloat(document.getElementById('item-price').value) || 0;
         const qty = parseInt(document.getElementById('item-qty').value) || 1;
-        const discount = parseFloat(document.getElementById('item-discount').value) || 100;
+        const discountInput = document.getElementById('item-discount').value;
+        const discount = discountInput !== '' ? parseFloat(discountInput) : 100;
         const taxRate = parseFloat(document.getElementById('item-tax').value) || 1.0;
 
         const discountedUnitPrice = rawPrice * (discount / 100);
@@ -553,7 +558,7 @@
         const name = nameInput.value.trim() || '未命名商品';
         const rawPrice = parseFloat(priceInput.value);
         const qty = parseInt(qtyInput.value) || 1;
-        const discount = parseFloat(discountInput.value) || 100;
+        const discount = discountInput.value !== '' ? parseFloat(discountInput.value) : 100;
         const taxRate = parseFloat(taxSelect.value) || 1.0;
 
         if (isNaN(rawPrice) || rawPrice <= 0) {
@@ -586,6 +591,7 @@
         qtyInput.value = '1';
         discountInput.value = '100';
         updateLivePreview();
+        nameInput.focus();
     }
 
     function toggleStatus(id, key) {
@@ -664,7 +670,10 @@
         item.name = document.getElementById('edit-name').value.trim() || '未命名商品';
         item.price = rawPrice;
         item.qty = parseInt(document.getElementById('edit-qty').value) || 1;
-        item.discount = parseFloat(document.getElementById('edit-discount').value) || 100;
+        
+        const discountInput = document.getElementById('edit-discount').value;
+        item.discount = discountInput !== '' ? parseFloat(discountInput) : 100;
+        
         item.taxRate = taxRate;
         item.taxLabel = taxLabel;
 
@@ -675,7 +684,6 @@
     }
 
     function render() {
-        saveData();
         const listEl = document.getElementById('item-list');
         listEl.innerHTML = '';
 
@@ -750,7 +758,6 @@
             return;
         }
 
-        // 依類別分組
         const categories = {};
         state.items.forEach(item => {
             const cat = item.category || '其他';
@@ -799,7 +806,6 @@
     }
 
     function exportJSON() {
-        saveData();
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
         const downloadAnchor = document.createElement('a');
         const today = new Date().toISOString().slice(0, 10);
@@ -837,7 +843,6 @@
         event.target.value = '';
     }
 
-    // --- 切換分頁或回到頁面時自動刷資料 ---
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
             loadData();
@@ -852,7 +857,7 @@
         renderChecklist();
     });
 
-    // --- 頁面首次載入初始化 ---
+    // 頁面初始化
     loadData();
     render();
     updateLivePreview();
