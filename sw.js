@@ -5,7 +5,8 @@ const ASSETS_TO_CACHE = [
   './handbook.html',
   './database.html',
   './communication.html',
-  './calculator.html'
+  './calculator.html',
+  './checklist.html'
 ];
 
 // 1. 安裝 Service Worker 並快取所有頁面
