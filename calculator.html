@@ -488,6 +488,7 @@
         if (tabName === 'calc') {
             document.querySelectorAll('.tab-btn')[0].classList.add('active');
             document.getElementById('tab-calc').classList.add('active');
+            render();
         } else {
             document.querySelectorAll('.tab-btn')[1].classList.add('active');
             document.getElementById('tab-checklist').classList.add('active');
@@ -501,7 +502,6 @@
             try {
                 state = JSON.parse(saved);
                 document.getElementById('rate').value = state.rate || 0.21;
-                // 防護舊資料缺少的預設屬性
                 if (Array.isArray(state.items)) {
                     state.items.forEach(item => {
                         item.category = item.category || '其他';
@@ -842,12 +842,14 @@
         if (!document.hidden) {
             loadData();
             render();
+            renderChecklist();
         }
     });
 
     window.addEventListener('focus', function() {
         loadData();
         render();
+        renderChecklist();
     });
 
     // --- 頁面首次載入初始化 ---
