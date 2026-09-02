@@ -27,12 +27,38 @@
             margin: 0 auto;
         }
 
-        h2 {
-            margin-top: 0;
-            color: #1d3557;
+        /* Tab 頁籤樣式 */
+        .tab-nav {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #e9ecef;
+            color: #495057;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .card {
@@ -252,14 +278,64 @@
             max-width: 500px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
+
+        /* Checklist 專用樣式 */
+        .category-card {
+            background: white;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: #1d3557;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-bar-fill {
+            background: #2a9d8f;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+        }
+
+        .checklist-item.done span {
+            text-decoration: line-through;
+            color: #a8a29e;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>
-        <span>🧮 購物速算與比價</span>
-    </h2>
+    <!-- 頁籤導覽列 -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('calc')">🧮 購物速算</button>
+        <button class="tab-btn" onclick="switchTab('checklist')">📋 購物 Checklist</button>
+    </div>
 
     <!-- 匯入 / 匯出 備份區塊 -->
     <div class="backup-bar">
@@ -268,73 +344,92 @@
         <input type="file" id="import-file" accept=".json" onchange="importJSON(event)">
     </div>
 
-    <!-- 頂部通用匯率設定 -->
-    <div class="card">
-        <div class="form-group">
-            <label for="rate">日圓匯率 (JPY ➡️ TWD)</label>
-            <input type="number" id="rate" step="0.0001" value="0.21" oninput="updateLivePreview(); render();">
-        </div>
-    </div>
-
-    <!-- 新增品項 -->
-    <div class="card">
-        <div class="form-group">
-            <label for="item-name">商品名稱 / 店名</label>
-            <input type="text" id="item-name" placeholder="例：合利他命 270錠 (BicCamera)">
-        </div>
-
-        <div class="grid-3">
+    <!-- ================= TAB 1: 購物速算 ================= -->
+    <div id="tab-calc" class="tab-content active">
+        <!-- 頂部通用匯率設定 -->
+        <div class="card">
             <div class="form-group">
-                <label for="item-price">日幣單價</label>
-                <input type="number" id="item-price" placeholder="5000" oninput="updateLivePreview()">
-            </div>
-            <div class="form-group">
-                <label for="item-qty">數量</label>
-                <input type="number" id="item-qty" value="1" min="1" oninput="updateLivePreview()">
-            </div>
-            <div class="form-group">
-                <label for="item-discount">折扣 (%)</label>
-                <input type="number" id="item-discount" value="100" placeholder="95" oninput="updateLivePreview()">
+                <label for="rate">日圓匯率 (JPY ➡️ TWD)</label>
+                <input type="number" id="rate" step="0.0001" value="0.21" oninput="updateLivePreview(); render();">
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="item-tax">適用消費稅率 / 免稅</label>
-            <select id="item-tax" onchange="updateLivePreview()">
-                <option value="1.00">免稅 0% (Tax Free / 滿額退稅)</option>
-                <option value="1.10" selected>一般商品 10% (服飾、電器、日用)</option>
-                <option value="1.08">食品/輕稅 8% (超市外帶、零食)</option>
-            </select>
+        <!-- 新增品項 -->
+        <div class="card">
+            <div class="form-group">
+                <label for="item-category">商品分類</label>
+                <select id="item-category">
+                    <option value="藥妝">💊 藥妝</option>
+                    <option value="家電">🔌 家電</option>
+                    <option value="食品零食">🍘 食品 / 零食</option>
+                    <option value="服飾鞋包">👟 服飾 / 鞋包</option>
+                    <option value="其他" selected>📦 其他</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="item-name">商品名稱 / 店名</label>
+                <input type="text" id="item-name" placeholder="例：合利他命 270錠 (BicCamera)">
+            </div>
+
+            <div class="grid-3">
+                <div class="form-group">
+                    <label for="item-price">日幣單價</label>
+                    <input type="number" id="item-price" placeholder="5000" oninput="updateLivePreview()">
+                </div>
+                <div class="form-group">
+                    <label for="item-qty">數量</label>
+                    <input type="number" id="item-qty" value="1" min="1" oninput="updateLivePreview()">
+                </div>
+                <div class="form-group">
+                    <label for="item-discount">折扣 (%)</label>
+                    <input type="number" id="item-discount" value="100" placeholder="95" oninput="updateLivePreview()">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="item-tax">適用消費稅率 / 免稅</label>
+                <select id="item-tax" onchange="updateLivePreview()">
+                    <option value="1.00">免稅 0% (Tax Free / 滿額退稅)</option>
+                    <option value="1.10" selected>一般商品 10% (服飾、電器、日用)</option>
+                    <option value="1.08">食品/輕稅 8% (超市外帶、零食)</option>
+                </select>
+            </div>
+
+            <!-- 即時計算預覽卡片 -->
+            <div class="live-calc-preview">
+                <span>預覽總日幣: <span id="preview-jpy">¥ 0</span></span>
+                <span>約合台幣: <strong id="preview-twd">NT$ 0</strong></span>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" onclick="addItem()">➕ 新增品項</button>
+            </div>
         </div>
 
-        <!-- 即時計算預覽卡片 -->
-        <div class="live-calc-preview">
-            <span>預覽總日幣: <span id="preview-jpy">¥ 0</span></span>
-            <span>約合台幣: <strong id="preview-twd">NT$ 0</strong></span>
+        <!-- 清單控制項 -->
+        <div class="list-header">
+            <strong style="color: #1d3557;">購物清單</strong>
+            <label class="checkbox-label">
+                <input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)"> 全選 (計算全趟行程總額)
+            </label>
         </div>
 
-        <div class="btn-group">
-            <button class="btn-primary" onclick="addItem()">➕ 新增品項</button>
+        <!-- 清單顯示區 -->
+        <ul class="item-list" id="item-list"></ul>
+
+        <!-- 總計區 -->
+        <div class="total-box">
+            <h3 id="total-title">預估結帳金額 (已選取品項)</h3>
+            <div class="price-large" id="total-twd">約 NT$ 0</div>
+            <div id="total-jpy" style="opacity: 0.8; font-size:0.9rem; margin-top:4px;">(總計 ¥ 0)</div>
+            <div class="qty-summary" id="total-qty">選取件數：0 件</div>
         </div>
     </div>
 
-    <!-- 清單控制項 -->
-    <div class="list-header">
-        <strong style="color: #1d3557;">購物清單</strong>
-        <label class="checkbox-label">
-            <input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)"> 全選 (計算全趟行程總額)
-        </label>
-    </div>
-
-    <!-- 清單顯示區 -->
-    <ul class="item-list" id="item-list"></ul>
-
-    <!-- 總計區 -->
-    <div class="total-box">
-        <h3 id="total-title">預估結帳金額 (已選取品項)</h3>
-        <div class="price-large" id="total-twd">約 NT$ 0</div>
-        <div id="total-jpy" style="opacity: 0.8; font-size:0.9rem; margin-top:4px;">(總計 ¥ 0)</div>
-        <div class="qty-summary" id="total-qty">選取件數：0 件</div>
+    <!-- ================= TAB 2: 分類 CHECKLIST ================= -->
+    <div id="tab-checklist" class="tab-content">
+        <div id="checklist-container"></div>
     </div>
 </div>
 
@@ -344,6 +439,17 @@
         <h3 style="margin-top:0; color:#1d3557;">✏️ 編輯商品資料</h3>
         <input type="hidden" id="edit-id">
         
+        <div class="form-group">
+            <label for="edit-category">商品分類</label>
+            <select id="edit-category">
+                <option value="藥妝">💊 藥妝</option>
+                <option value="家電">🔌 家電</option>
+                <option value="食品零食">🍘 食品 / 零食</option>
+                <option value="服飾鞋包">👟 服飾 / 鞋包</option>
+                <option value="其他">📦 其他</option>
+            </select>
+        </div>
+
         <div class="form-group">
             <label for="edit-name">商品名稱 / 店名</label>
             <input type="text" id="edit-name">
@@ -386,6 +492,20 @@
         items: []
     };
 
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        if (tabName === 'calc') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('tab-calc').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('tab-checklist').classList.add('active');
+            renderChecklist();
+        }
+    }
+
     function loadData() {
         const saved = localStorage.getItem('shopping_calculator_data');
         if (saved) {
@@ -419,12 +539,14 @@
     }
 
     function addItem() {
+        const categorySelect = document.getElementById('item-category');
         const nameInput = document.getElementById('item-name');
         const priceInput = document.getElementById('item-price');
         const qtyInput = document.getElementById('item-qty');
         const discountInput = document.getElementById('item-discount');
         const taxSelect = document.getElementById('item-tax');
 
+        const category = categorySelect.value || '其他';
         const name = nameInput.value.trim() || '未命名商品';
         const rawPrice = parseFloat(priceInput.value);
         const qty = parseInt(qtyInput.value) || 1;
@@ -442,6 +564,7 @@
 
         state.items.push({
             id: Date.now(),
+            category: category,
             name: name,
             price: rawPrice,
             qty: qty,
@@ -468,6 +591,7 @@
             item[key] = !item[key];
             saveData();
             render();
+            renderChecklist();
         }
     }
 
@@ -483,14 +607,15 @@
         state.items = state.items.filter(item => item.id !== id);
         saveData();
         render();
+        renderChecklist();
     }
 
-    // 開啟編輯彈窗並填入原資料
     function openEditModal(id) {
         const item = state.items.find(i => i.id === id);
         if (!item) return;
 
         document.getElementById('edit-id').value = item.id;
+        document.getElementById('edit-category').value = item.category || '其他';
         document.getElementById('edit-name').value = item.name;
         document.getElementById('edit-price').value = item.price;
         document.getElementById('edit-qty').value = item.qty || 1;
@@ -504,7 +629,6 @@
         document.getElementById('edit-modal').style.display = 'none';
     }
 
-    // 儲存修改後的資料
     function saveEdit() {
         const id = parseInt(document.getElementById('edit-id').value);
         const item = state.items.find(i => i.id === id);
@@ -521,6 +645,7 @@
         if (taxRate === 1.10) taxLabel = '10%';
         if (taxRate === 1.08) taxLabel = '8%';
 
+        item.category = document.getElementById('edit-category').value || '其他';
         item.name = document.getElementById('edit-name').value.trim() || '未命名商品';
         item.price = rawPrice;
         item.qty = parseInt(document.getElementById('edit-qty').value) || 1;
@@ -530,6 +655,7 @@
 
         saveData();
         render();
+        renderChecklist();
         closeEditModal();
     }
 
@@ -555,7 +681,6 @@
             const itemTotalJPY = Math.round(discountedUnitPrice * (item.taxRate || 1.0) * qty);
             const itemTotalTWD = Math.round(itemTotalJPY * state.rate);
             
-            // 獨立邏輯：已買的項目不加入結算
             if (item.inCart && !item.purchased) {
                 totalJPY += itemTotalJPY;
                 totalTWD += itemTotalTWD;
@@ -574,7 +699,7 @@
                     </label>
                 </div>
                 <div class="item-info">
-                    <strong class="item-name">${escapeHtml(item.name)} <span class="qty-tag">x${qty}</span></strong>
+                    <strong class="item-name">[${escapeHtml(item.category || '其他')}] ${escapeHtml(item.name)} <span class="qty-tag">x${qty}</span></strong>
                     <span>單價 ¥${item.price.toLocaleString()} | ${item.discount < 100 ? `${item.discount}折` : '無折扣'} | 稅率: ${item.taxLabel}</span>
                 </div>
                 <div class="item-price">
@@ -599,6 +724,57 @@
         document.getElementById('total-jpy').innerText = `(總計 ¥ ${totalJPY.toLocaleString()})`;
         document.getElementById('total-twd').innerText = `約 NT$ ${totalTWD.toLocaleString()}`;
         document.getElementById('total-qty').innerText = `選取商品總數量：${totalQty} 件`;
+    }
+
+    function renderChecklist() {
+        const container = document.getElementById('checklist-container');
+        container.innerHTML = '';
+
+        if (state.items.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:30px; color:#888;">尚未新增任何商品，請先在「購物速算」頁籤加入項目。</div>';
+            return;
+        }
+
+        // 依類別分組
+        const categories = {};
+        state.items.forEach(item => {
+            const cat = item.category || '其他';
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push(item);
+        });
+
+        Object.keys(categories).forEach(cat => {
+            const items = categories[cat];
+            const completedCount = items.filter(i => i.purchased).length;
+            const progressPercent = Math.round((completedCount / items.length) * 100);
+
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            
+            let itemsHtml = '';
+            items.forEach(item => {
+                itemsHtml += `
+                    <div class="checklist-item ${item.purchased ? 'done' : ''}">
+                        <input type="checkbox" ${item.purchased ? 'checked' : ''} onchange="toggleStatus(${item.id}, 'purchased')">
+                        <span style="flex:1;">${escapeHtml(item.name)} <small style="color:#666;">(x${item.qty || 1})</small></span>
+                    </div>
+                `;
+            });
+
+            card.innerHTML = `
+                <div class="category-header">
+                    <span>${escapeHtml(cat)}</span>
+                    <span style="font-size:0.85rem; color:#666;">${completedCount} / ${items.length} (${progressPercent}%)</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
+                </div>
+                <div style="margin-top: 10px;">
+                    ${itemsHtml}
+                </div>
+            `;
+            container.appendChild(card);
+        });
     }
 
     function escapeHtml(str) {
@@ -632,6 +808,7 @@
                     saveData();
                     document.getElementById('rate').value = state.rate || 0.21;
                     render();
+                    renderChecklist();
                     updateLivePreview();
                     alert('匯入成功！清單與設定已更新。');
                 } else {
