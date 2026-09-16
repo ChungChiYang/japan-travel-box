@@ -1,4 +1,4 @@
-const CACHE_NAME = 'japan-travel-v14';
+const CACHE_NAME = 'japan-travel-v15';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -6,7 +6,8 @@ const ASSETS_TO_CACHE = [
   './database.html',
   './communication.html',
   './calculator.html',
-  './checklist.html'
+  './checklist.html',
+  './fujifilmguide.html'
 ];
 
 // 1. 安裝 Service Worker 並快取所有頁面
