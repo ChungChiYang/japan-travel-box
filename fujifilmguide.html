@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fujifilm X-T30 III 旅拍參數與色彩手冊</title>
+  <style>
+    :root {
+      --fuji-black: #1a1a1a;
+      --fuji-red: #d9381e;
+      --fuji-paper: #fbfbfa;
+      --fuji-gray-bg: #f4f3ef;
+      --fuji-border: #e2e0d8;
+      --text-main: #2c2c2c;
+      --text-sub: #666666;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "PingFang TC", sans-serif;
+      background-color: var(--fuji-gray-bg);
+      color: var(--text-main);
+      margin: 0;
+      padding: 16px;
+      line-height: 1.6;
+    }
+
+    .container { max-width: 720px; margin: 0 auto; }
+
+    header {
+      border-bottom: 2px solid var(--fuji-black);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+    .brand-tag {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: var(--fuji-red);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin: 4px 0 0 0;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-left: 4px solid var(--fuji-red);
+      padding-left: 10px;
+      margin: 24px 0 12px 0;
+    }
+
+    .card {
+      background: var(--fuji-paper);
+      border: 1px solid var(--fuji-border);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .intro-card {
+      background: #fff;
+      border: 1px solid var(--fuji-border);
+      padding: 12px;
+      border-radius: 4px;
+    }
+    .intro-card h4 {
+      margin: 0 0 4px 0;
+      font-size: 0.95rem;
+      color: var(--fuji-black);
+    }
+    .intro-card p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    /* 參數詳細說明區塊 */
+    .param-detail-group {
+      margin-bottom: 14px;
+    }
+    .param-detail-group:last-child {
+      margin-bottom: 0;
+    }
+    .param-detail-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--fuji-red);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .param-detail-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      font-size: 0.85rem;
+    }
+    .param-detail-list li {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 4px;
+    }
+    .param-detail-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--fuji-red);
+      font-weight: bold;
+    }
+
+    .film-select-wrapper { margin-bottom: 12px; }
+    select.fuji-select {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.95rem;
+      border: 1px solid var(--fuji-black);
+      background: #fff;
+      border-radius: 2px;
+      color: var(--fuji-black);
+      font-weight: 600;
+    }
+    .film-display {
+      background: var(--fuji-black);
+      color: #fff;
+      padding: 16px;
+      border-radius: 4px;
+    }
+    .film-badge {
+      display: inline-block;
+      background: var(--fuji-red);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .film-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .film-desc {
+      font-size: 0.85rem;
+      color: #ccc;
+    }
+
+    .label-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin: 8px 0 4px 0;
+    }
+    .tag-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .tag-btn {
+      border: 1px solid var(--fuji-border);
+      background: #fff;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+    .tag-btn.active {
+      background: var(--fuji-black);
+      color: #fff;
+      border-color: var(--fuji-black);
+    }
+
+    .result-card {
+      background: var(--fuji-paper);
+      border: 2px solid var(--fuji-black);
+      padding: 16px;
+      margin-top: 16px;
+    }
+    .param-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .param-item {
+      background: #fff;
+      border: 1px solid var(--fuji-border);
+      padding: 8px;
+      font-size: 0.85rem;
+    }
+    .param-item strong { display: block; font-size: 0.75rem; color: var(--text-sub); }
+
+    .fb-btn {
+      border: 1px solid #d97706;
+      background: #fffbe0;
+      color: #b45309;
+      font-size: 0.8rem;
+      padding: 6px 10px;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .fb-btn.active {
+      background: #d97706;
+      color: #fff;
+    }
+    .alert-box {
+      margin-top: 12px;
+      background: #fff3f2;
+      border-left: 3px solid var(--fuji-red);
+      padding: 10px;
+      font-size: 0.85rem;
+      color: #900;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="brand-tag">FUJIFILM X-T30 III Guide</div>
+      <h1>日本旅拍參數與色彩指南</h1>
+    </header>
+
+    <!-- 01 / 相機基礎參數說明 -->
+    <div class="section-title">01 / 相機基礎參數說明</div>
+    <div class="intro-grid">
+      <div class="intro-card">
+        <h4>光圈 (F值)</h4>
+        <p>控制進光與背景虛化。數字小（如 F1.8）背景糊；數字大（如 F8）風景前後都清晰。</p>
+      </div>
+      <div class="intro-card">
+        <h4>快門速度 (S)</h4>
+        <p>防手震與捕捉瞬間。街拍建議 1/125s 以上，運動人群 1/500s，手持極限 1/30s。</p>
+      </div>
+      <div class="intro-card">
+        <h4>感光度 (ISO)</h4>
+        <p>控制對光的敏感度。白天用 Auto1 (160-800)，暗光用 Auto3 (最高 6400)。</p>
+      </div>
+      <div class="intro-card">
+        <h4>快門類型 (MS/ES)</h4>
+        <p>MS 機械快門防果凍效應；ES 電子快門最高達 1/32000s，大晴天開大光圈必備。</p>
+      </div>
+      <div class="intro-card" style="grid-column: 1 / -1;">
+        <h4>對焦模式 (Focus Mode Switch)</h4>
+        <p><strong>S (單次)</strong>：半按快門對焦一次鎖定，適合風景、靜物與靜止人像。<br>
+        <strong>C (連續)</strong>：半按快門持續追焦，適合走動人物、寵物與車輛。<br>
+        <strong>M (手動)</strong>：轉動鏡頭對焦環手動對焦，適合夜景星空或隔著欄網防誤焦。</p>
+      </div>
+    </div>
+
+    <!-- 02 / 富士獨門色彩與明暗參數 -->
+    <div class="section-title">02 / 富士獨門色彩與明暗參數</div>
+    <div class="card">
+      <div class="param-detail-group">
+        <div class="param-detail-title">富士系統白平衡設定 (WB Shift)</div>
+        <ul class="param-detail-list">
+          <li><strong>R (色調, 紅/綠)</strong>：增加偏紅暖調，減少偏綠涼感。</li>
+          <li><strong>B (色溫, 藍/黃)</strong>：增加偏藍冷調，減少偏黃暖感。</li>
+          <li><em>範例 (暖中帶綠)</em>：R -1 / B -1（微減紅微減藍，增添些許日系青綠氛圍）。</li>
+          <li><em>範例 (清新透亮)</em>：R -1 / B +3（偏藍偏綠，打造乾淨日系透明感）。</li>
+          <li><em>範例 (復古暖陽)</em>：R +4 / B -5（偏紅偏黃，夕陽或溫暖濃郁底片感）。</li>
+        </ul>
+      </div>
+
+      <div class="param-detail-group">
+        <div class="param-detail-title">富士系統 3 大飽和度設定</div>
+        <ul class="param-detail-list">
+          <li><strong>色彩 (Color)</strong>：控制畫面整體飽和度。</li>
+          <li><strong>彩色效果 (Color Chrome Effect)</strong>：控制暖色（如人的膚色、暖色調建築、稻穗、紅葉等）飽和度與層次，一般環境設 Weak 即可。</li>
+          <li><strong>色彩漸變特效藍色 (Color Chrome FX Blue)</strong>：控制冷色（藍色調飽和度提升），適合大晴天天空或藍海。</li>
+        </ul>
+      </div>
+
+      <div class="param-detail-group">
+        <div class="param-detail-title">富士系統 3 大對比度設定 (解決亮過曝、暗太暗)</div>
+        <ul class="param-detail-list">
+          <li><strong>動態範圍 (Dynamic Range, DR)</strong>：數字小 (DR100) 中間調細節保留少、對比強；數字大 (DR200/DR400) 中間調細節保留多、對比弱（防亮部過曝）。</li>
+          <li><strong>D範圍優先 (DR Priority)</strong>：同時自動調整亮部與暗部的無腦平衡模式（啟用時無法單獨調色調曲線）。</li>
+          <li><strong>色調曲線 (Tone Curve)</strong>：個別調整亮部 (Highlight) 與暗部 (Shadow)。常見 S 曲線（亮部拉亮 +1、暗部拉暗 +1）可讓畫面對比度變強、風格更濃烈。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 03 / 軟片模擬 20 種風格庫 -->
+    <div class="section-title">03 / 軟片模擬 20 種風格庫</div>
+    <div class="card">
+      <div class="film-select-wrapper">
+        <select id="filmSelect" class="fuji-select"></select>
+      </div>
+      <div class="film-display">
+        <span class="film-badge" id="filmBadge">CLASSIC</span>
+        <div class="film-name" id="filmName">CLASSIC CHROME</div>
+        <div class="film-desc" id="filmDesc">說明加載中...</div>
+      </div>
+    </div>
+
+    <!-- 04 / 拍攝情境參數對照 -->
+    <div class="section-title">04 / 拍攝情境參數對照</div>
+    <div class="card">
+      <div class="label-title">光線環境</div>
+      <div class="tag-group" id="lightGroup">
+        <button class="tag-btn active" data-val="sun">大晴天 / 頂光</button>
+        <button class="tag-btn" data-val="cloud">陰天 / 燈光室內</button>
+        <button class="tag-btn" data-val="night">夜景 / 極暗處</button>
+        <button class="tag-btn" data-val="back">逆光 / 夕陽</button>
+      </div>
+
+      <div class="label-title">拍攝題材</div>
+      <div class="tag-group" id="targetGroup">
+        <button class="tag-btn active" data-val="portrait">人像 / 女友隨拍</button>
+        <button class="tag-btn" data-val="street">日本街景 / 建築</button>
+        <button class="tag-btn" data-val="food">美食 / 特寫靜物</button>
+        <button class="tag-btn" data-val="sports">高速動態 / 車輛</button>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div style="font-weight: 700; font-size: 1rem;">建議調整組合</div>
+      <div class="param-grid" id="paramOutput"></div>
+
+      <div class="label-title" style="margin-top: 16px;">拍完即時校正微調：</div>
+      <div class="tag-group" id="fbGroup">
+        <button class="fb-btn" data-fb="dark">畫面太暗</button>
+        <button class="fb-btn" data-fb="bright">畫面太亮/過曝</button>
+        <button class="fb-btn" data-fb="yellow">顏色太黃/太暖</button>
+        <button class="fb-btn" data-fb="blue">顏色太藍/太冷</button>
+        <button class="fb-btn" data-fb="blur">手震模糊</button>
+      </div>
+      <div id="alertBox"></div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 富士 20 種軟片模擬資料庫
+      const filmData = [
+        { id: "classic_chrome", name: "CLASSIC CHROME", cat: "經典街拍", desc: "低飽和度、高陰影對比。非常適合日本街道、古建築，帶有濃厚的日系雜誌質感。" },
+        { id: "classic_neg", name: "CLASSIC Neg.", cat: "復古負片", desc: "還原傳統 Superia 底片。綠色偏黃、紅色深沉，拍日本商店街或老街極具懷舊氛圍。" },
+        { id: "reala_ace", name: "REALA ACE", cat: "最新世代", desc: "色彩忠實且階調過渡極其平滑，高光與陰影完美平衡，是旅拍全能首選。" },
+        { id: "nostalgic_neg", name: "NOSTALGIC Neg.", cat: "暖調懷舊", desc: "高光帶有琥珀色溫暖感，非常適合拍攝夕陽、日落時分或木質調的日本咖啡廳。" },
+        { id: "provia", name: "PROVIA (Standard)", cat: "標準還原", desc: "標準富士色彩，精準還原現場色調，適合初次上手或記錄性質隨拍。" },
+        { id: "velvia", name: "Velvia (Vivid)", cat: "鮮艷風景", desc: "超高飽和與高對比。晴天拍富士山、海景、紅葉絕配，但不適合拍人像。" },
+        { id: "astia", name: "ASTIA (Soft)", cat: "柔和人像", desc: "降低彩度並軟化階調，能拍出透亮粉嫩的皮膚，女友隨拍首選。" },
+        { id: "pro_neg_hi", name: "PRO Neg. Hi", cat: "專業人像", desc: "對比度較高的專業人像底片，適合在室外自然光下強調輪廓的街拍人像。" },
+        { id: "pro_neg_std", name: "PRO Neg. Std", cat: "軟調人像", desc: "極低對比度與平緩膚色過渡，適合午後陽光強烈時緩和硬光。" },
+        { id: "eterna", name: "ETERNA (Cinema)", cat: "電影質感", desc: "低對比度與高動態範圍，保留極多高光與陰影細節，呈現低調故事感。" },
+        { id: "eterna_bb", name: "ETERNA BLEACH BYPASS", cat: "留銀沖洗", desc: "極低彩度、高金屬對比，適合雨天、都市建築或冷峻風格創作。" },
+        { id: "acros", name: "ACROS (標準)", cat: "高質感黑白", desc: "質感極佳的黑白效果，細節比一般黑白更豐富，強調光影質感。" },
+        { id: "acros_y", name: "ACROS + Yellow 濾鏡", cat: "高質感黑白", desc: "微幅加深天空對比，稍微亮化膚色。" },
+        { id: "acros_r", name: "ACROS + Red 濾鏡", cat: "高質感黑白", desc: "大幅加深天空與陰影對比，極具戲劇張力。" },
+        { id: "acros_g", name: "ACROS + Green 濾鏡", cat: "高質感黑白", desc: "強調綠色階調，強化人像嘴唇與紅潤感。" },
+        { id: "mono", name: "MONOCHROME", cat: "基礎黑白", desc: "標準單色黑白模式。" },
+        { id: "mono_y", name: "MONOCHROME + Y", cat: "基礎黑白", desc: "帶黃色濾鏡的基礎黑白。" },
+        { id: "mono_r", name: "MONOCHROME + R", cat: "基礎黑白", desc: "帶紅色濾鏡的高對比黑白。" },
+        { id: "mono_g", name: "MONOCHROME + G", cat: "基礎黑白", desc: "帶綠色濾鏡的黑白。" },
+        { id: "sepia", name: "SEPIA", cat: "復古棕褐色", desc: "暖棕暖黃色調，呈現老照片質感。" }
+      ];
+
+      // 1. 初始化下拉選單
+      const filmSelect = document.getElementById('filmSelect');
+      if (filmSelect) {
+        filmSelect.innerHTML = ''; // 清空
+        filmData.forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f.id;
+          opt.innerText = `${f.name} — ${f.cat}`;
+          filmSelect.appendChild(opt);
+        });
+
+        filmSelect.addEventListener('change', (e) => updateFilmInfo(e.target.value));
+      }
+
+      // 2. 更新膠片資訊顯示區
+      function updateFilmInfo(id) {
+        const f = filmData.find(item => item.id === id);
+        if (f) {
+          const badge = document.getElementById('filmBadge');
+          const name = document.getElementById('filmName');
+          const desc = document.getElementById('filmDesc');
+
+          if (badge) badge.innerText = f.cat;
+          if (name) name.innerText = f.name;
+          if (desc) desc.innerText = f.desc;
+        }
+      }
+
+      // 預設載入第一個
+      updateFilmInfo(filmData[0].id);
+
+      // 3. 狀態與矩陣切換邏輯
+      const state = { light: 'sun', target: 'portrait', fb: null };
+
+      function bindTags(groupId, key) {
+        const group = document.getElementById(groupId);
+        if (!group) return;
+
+        group.addEventListener('click', (e) => {
+          const btn = e.target.closest('button');
+          if (!btn) return;
+
+          const btns = group.querySelectorAll('button');
+          const val = btn.dataset.val || btn.dataset.fb;
+
+          if (key === 'fb') {
+            if (state.fb === val) {
+              state.fb = null;
+              btn.classList.remove('active');
+            } else {
+              btns.forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              state.fb = val;
+            }
+          } else {
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state[key] = val;
+          }
+          renderResult();
+        });
+      }
+
+      bindTags('lightGroup', 'light');
+      bindTags('targetGroup', 'target');
+      bindTags('fbGroup', 'fb');
+
+      // 4. 渲染參數與微調結果
+      function renderResult() {
+        let mode = "A 模式 (光圈先決)";
+        let focusMode = "S (單次對焦)";
+        let aperture = "F2.0 - F2.8 (大光圈虛化)";
+        let shutter = "1/125s ~ 1/4000s (Auto)";
+        let shutterType = "MS (機械快門)";
+        let iso = "ISO 160 (AUTO 1)";
+        let ev = "0 或 +0.3";
+        let colorConfig = "彩色效果: Weak | FX藍色: Off";
+        let dynamicRange = "DR100 / 色調曲線: H-1 S-1";
+        let wbShift = "R: -1 / B: +3 (日系清新氣氛)";
+
+        // 光線狀態
+        if (state.light === 'sun') {
+          shutterType = "MS+ES (強光大光圈會自動切至 1/32000s 電子快門)";
+          dynamicRange = "DR200 (保留亮部高光細節)";
+        } else if (state.light === 'cloud') {
+          iso = "AUTO 2 (上限 1600)";
+          wbShift = "R: +2 / B: -2 (補償陰天偏藍冷感)";
+        } else if (state.light === 'night') {
+          iso = "AUTO 3 (上限 6400)";
+          shutter = "防手震保持 1/60s 以上";
+          dynamicRange = "DR100";
+        } else if (state.light === 'back') {
+          ev = "+1.0 ~ +1.7 (大膽加曝光防臉黑)";
+          dynamicRange = "DR400 (強烈逆光防爆白)";
+          wbShift = "R: +4 / B: -5 (強化夕陽琥珀色溫)";
+        }
+
+        // 題材狀態
+        if (state.target === 'portrait') {
+          focusMode = "S (單次) / 建議開啟人眼追蹤";
+          colorConfig = "彩色效果: Weak (柔和膚色)";
+        } else if (state.target === 'street') {
+          aperture = "F5.6 - F8 (前後景清晰)";
+          colorConfig = "彩色效果: Strong | FX藍色: Strong";
+          wbShift = "R: -1 / B: +1 (街景冷冽層次)";
+        } else if (state.target === 'food') {
+          aperture = "F2.8 - F4 (近拍食物邊緣不失真)";
+          focusMode = "S (單次對焦)";
+          colorConfig = "彩色效果: Strong (提升暖色食物吸引力)";
+        } else if (state.target === 'sports') {
+          mode = "S 模式 (快門先決)";
+          focusMode = "C (連續對焦)";
+          shutter = "1/500s ~ 1/2000s (凍結瞬間)";
+          shutterType = "MS (避免電子快門果凍效應)";
+        }
+
+        const paramOutput = document.getElementById('paramOutput');
+        if (paramOutput) {
+          paramOutput.innerHTML = `
+            <div class="param-item"><strong>曝光模式</strong>${mode}</div>
+            <div class="param-item"><strong>對焦模式</strong>${focusMode}</div>
+            <div class="param-item"><strong>光圈 (F) / 快門</strong>${aperture} <br>${shutter}</div>
+            <div class="param-item"><strong>快門類型 / ISO</strong>${shutterType} <br>${iso}</div>
+            <div class="param-item"><strong>白平衡偏移 (WB)</strong>${wbShift}</div>
+            <div class="param-item"><strong>動態範圍 / 對比</strong>${dynamicRange}</div>
+            <div class="param-item" style="grid-column: 1 / -1;"><strong>色彩飽和設定</strong>${colorConfig} (EV 補償: ${ev})</div>
+          `;
+        }
+
+        // 反饋提示
+        const alertBox = document.getElementById('alertBox');
+        let alertMsg = "";
+        if (state.fb === 'dark') alertMsg = "💡 修正：右上方 EV 滾輪直接向右轉 <strong>+0.7 或 +1.0</strong>。";
+        if (state.fb === 'bright') alertMsg = "💡 修正：EV 滾輪向左轉 <strong>-0.7</strong>；大晴天開大光圈過曝請確認已設為 ES 電子快門。";
+        if (state.fb === 'yellow') alertMsg = "💡 修正：按 WB 鈕進入白平衡偏移，將座標點往 <strong>B (藍色)</strong> 移動 2~3 格（減 B 偏黃，加 B 偏藍）。";
+        if (state.fb === 'blue') alertMsg = "💡 修正：將白平衡偏移座標點往 <strong>R (紅) / A (琥珀)</strong> 移動 2~3 格（加 R 偏紅，減 R 偏綠）。";
+        if (state.fb === 'blur') alertMsg = "💡 修正：快門過慢導致手震！請切至 S 模式設定 1/250s 以上、切換至 C 連續對焦，或調高 ISO 上限。";
+
+        if (alertBox) {
+          alertBox.innerHTML = alertMsg ? `<div class="alert-box">${alertMsg}</div>` : "";
+        }
+      }
+
+      renderResult();
+    });
+  </script>
+</body>
+</html>
