@@ -17,7 +17,7 @@
 
     * { box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "PingFang TC", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "PingFang TC", "Microsoft JhengHei", sans-serif;
       background-color: var(--fuji-gray-bg);
       color: var(--text-main);
       margin: 0;
@@ -25,7 +25,7 @@
       line-height: 1.6;
     }
 
-    .container { max-width: 720px; margin: 0 auto; }
+    .container { max-width: 800px; margin: 0 auto; }
 
     header {
       border-bottom: 2px solid var(--fuji-black);
@@ -63,9 +63,10 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
 
+    /* 網格與基礎卡片 */
     .intro-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 12px;
     }
     .intro-card {
@@ -81,8 +82,83 @@
     }
     .intro-card p {
       margin: 0;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: var(--text-sub);
+    }
+
+    /* 曝光三要素觀念與關聯性卡片 */
+    .concept-box {
+      background: #fff;
+      border: 1px solid var(--fuji-border);
+      padding: 14px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .analogy-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--fuji-red);
+      margin-bottom: 6px;
+    }
+
+    /* 修正後的翹翹板矩陣網格 */
+    .triangle-matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .matrix-card {
+      background: #ffffff;
+      border: 1px solid var(--fuji-border);
+      border-left: 4px solid var(--fuji-black);
+      padding: 14px;
+      border-radius: 2px;
+    }
+    .matrix-card h5 {
+      margin: 0 0 8px 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--fuji-black);
+    }
+    .matrix-steps {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 0.85rem;
+    }
+    .matrix-steps li {
+      margin-bottom: 6px;
+    }
+    .matrix-steps li:last-child {
+      margin-bottom: 0;
+    }
+    .matrix-steps strong {
+      color: var(--fuji-black);
+    }
+    .matrix-steps span.sub {
+      color: var(--text-sub);
+      font-size: 0.82rem;
+    }
+
+    /* 白平衡四象限樣式 */
+    .quadrant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .quadrant-card {
+      background: #fff;
+      border: 1px solid var(--fuji-border);
+      border-top: 3px solid var(--fuji-red);
+      padding: 12px;
+      font-size: 0.85rem;
+    }
+    .quadrant-card strong {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--fuji-black);
+      margin-bottom: 4px;
     }
 
     /* 參數詳細說明區塊 */
@@ -195,6 +271,9 @@
       gap: 8px;
       margin-top: 12px;
     }
+    @media (max-width: 500px) {
+      .param-grid { grid-template-columns: 1fr; }
+    }
     .param-item {
       background: #fff;
       border: 1px solid var(--fuji-border);
@@ -224,6 +303,28 @@
       font-size: 0.85rem;
       color: #900;
     }
+
+    /* 實戰常見問題卡片 */
+    .problem-card {
+      background: #fff;
+      border: 1px solid var(--fuji-border);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .problem-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--fuji-black);
+      margin-bottom: 4px;
+    }
+    .problem-solution {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+    .problem-solution strong {
+      color: var(--fuji-red);
+    }
   </style>
 </head>
 <body>
@@ -238,16 +339,20 @@
     <div class="section-title">01 / 相機基礎參數說明</div>
     <div class="intro-grid">
       <div class="intro-card">
-        <h4>光圈 (F值)</h4>
-        <p>控制進光與背景虛化。數字小（如 F1.8）背景糊；數字大（如 F8）風景前後都清晰。</p>
+        <h4>光圈 (Aperture, F值)</h4>
+        <p>控制進光量與背景虛化。數字小（如 F1.8）進光多、背景虛化；數字大（如 F8）進光少、前後景象皆清晰。</p>
       </div>
       <div class="intro-card">
-        <h4>快門速度 (S)</h4>
-        <p>防手震與捕捉瞬間。街拍建議 1/125s 以上，運動人群 1/500s，手持極限 1/30s。</p>
+        <h4>快門速度 (Shutter, S)</h4>
+        <p>控制進光時間與動態捕捉。街拍建議 1/125s 以上，運動人群 1/500s，手持極限 1/30s。</p>
       </div>
       <div class="intro-card">
         <h4>感光度 (ISO)</h4>
-        <p>控制對光的敏感度。白天用 Auto1 (160-800)，暗光用 Auto3 (最高 6400)。</p>
+        <p>感光元件對光的敏感度。白天用 Auto1 (160-800)，暗光用 Auto3 (最高 6400)。越高噪點越多。</p>
+      </div>
+      <div class="intro-card">
+        <h4>EV 曝光補償 (Exposure Value)</h4>
+        <p><strong>相機明暗總開關</strong>。相機測光常被大面積白（雪景/白牆）或黑背景欺騙。「逢白加光 (+EV)、逢黑減光 (-EV)」，逆光人像補 +1.0 ~ +1.7 EV 防臉黑。</p>
       </div>
       <div class="intro-card">
         <h4>快門類型 (MS/ES)</h4>
@@ -261,17 +366,119 @@
       </div>
     </div>
 
-    <!-- 02 / 富士獨門色彩與明暗參數 -->
-    <div class="section-title">02 / 富士獨門色彩與明暗參數</div>
+    <!-- 02 / 曝光三要素核心概念與關聯性舉例 -->
+    <div class="section-title">02 / 曝光三要素核心概念與關聯性舉例</div>
+    <div class="card">
+      <div class="concept-box">
+        <div class="analogy-title">💡 通俗比喻：接水裝滿桶（裝滿水 = 曝光正確）</div>
+        <p style="font-size:0.85rem; margin:0;">
+          把「曝光」想像成用水龍頭接滿一桶水：
+          <br>• <strong>光圈</strong> = 水龍頭開口大小（開越大，水流越多）。
+          <br>• <strong>快門</strong> = 水龍頭開啟時間（開越久，接水量越多）。
+          <br>• <strong>ISO</strong> = 水桶本身的吸水放大器（水不夠時硬放大幅度，但會產生雜質噪點）。
+        </p>
+      </div>
+
+      <div class="analogy-title" style="margin-top:16px;">🔄 實戰連動補償關係（翹翹板效應）</div>
+      <p style="font-size:0.85rem; color:var(--text-sub); margin-top:2px; margin-bottom:12px;">
+        為了維持畫面「亮度不變」，當你改變其中一個參數時，必須調整另一個參數來抵銷：
+      </p>
+
+      <!-- 排版修正後的 4 個卡片 -->
+      <div class="triangle-matrix">
+        <div class="matrix-card">
+          <h5>情境 A：晴天想拍背景虛化人像</h5>
+          <ol class="matrix-steps">
+            <li>
+              <strong>開大光圈 (F2.8)</strong><br>
+              <span class="sub">讓背景變糊 ➔ 進光量暴增（畫面太亮）</span>
+            </li>
+            <li>
+              <strong>補償方案：將快門調快 (1/1000s)</strong><br>
+              <span class="sub">縮短進光時間。</span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="matrix-card">
+          <h5>情境 B：夜間街拍怕照片手震模糊</h5>
+          <ol class="matrix-steps">
+            <li>
+              <strong>調快快門 (1/125s)</strong><br>
+              <span class="sub">凍結畫面 ➔ 進光時間太短（畫面太暗）</span>
+            </li>
+            <li>
+              <strong>補償方案：開大光圈 (F2.0) 加上提高 ISO (3200)</strong><br>
+              <span class="sub">補足亮度。</span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="matrix-card">
+          <h5>情境 C：大晴天拍風景想要前後清晰</h5>
+          <ol class="matrix-steps">
+            <li>
+              <strong>縮小光圈 (F8.0)</strong><br>
+              <span class="sub">讓前後景色清晰 ➔ 進光量變少</span>
+            </li>
+            <li>
+              <strong>補償方案：ISO 保持 160，快門放慢至 1/250s</strong><br>
+              <span class="sub">日光充足下，稍微放慢快門即可補足亮度。</span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="matrix-card">
+          <h5>情境 D：室內捕捉走動中的人物</h5>
+          <ol class="matrix-steps">
+            <li>
+              <strong>快門必須 1/250s、光圈開最大 (F2.8)</strong><br>
+              <span class="sub">防動態模糊並儘量進光</span>
+            </li>
+            <li>
+              <strong>補償方案：拉高 ISO (1600 - 3200)</strong><br>
+              <span class="sub">光線仍不足時，唯有提高感光度。</span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 / 富士獨門色彩與明暗參數 -->
+    <div class="section-title">03 / 富士獨門色彩與明暗參數</div>
     <div class="card">
       <div class="param-detail-group">
-        <div class="param-detail-title">富士系統白平衡設定 (WB Shift)</div>
-        <ul class="param-detail-list">
-          <li><strong>R (色調, 紅/綠)</strong>：增加偏紅暖調，減少偏綠涼感。</li>
-          <li><strong>B (色溫, 藍/黃)</strong>：增加偏藍冷調，減少偏黃暖感。</li>
-          <li><em>範例 (暖中帶綠)</em>：R -1 / B -1（微減紅微減藍，增添些許日系青綠氛圍）。</li>
-          <li><em>範例 (清新透亮)</em>：R -1 / B +3（偏藍偏綠，打造乾淨日系透明感）。</li>
-          <li><em>範例 (復古暖陽)</em>：R +4 / B -5（偏紅偏黃，夕陽或溫暖濃郁底片感）。</li>
+        <div class="param-detail-title">富士系統白平衡設定 (WB Shift) 四象限風格</div>
+        <p style="font-size:0.82rem; color:var(--text-sub); margin-top:2px; margin-bottom:8px;">
+          座標軸：橫軸 R（右紅/左綠）與縱軸 B（上藍/下黃），微調格數即可改變整體氛圍：
+        </p>
+
+        <div class="quadrant-grid">
+          <div class="quadrant-card">
+            <strong>第一象限（右上：偏藍 + 偏紅 ➔ 冷紫/冷粉）</strong>
+            • <strong>風格：</strong> 高冷帶粉紫調，日系空氣感與透亮少女感。<br>
+            • <strong>適用：</strong> 提亮亞洲人膚色（顯白通透）、夢幻紫調夜景。
+          </div>
+          <div class="quadrant-card">
+            <strong>第二象限（左上：偏藍 + 偏綠 ➔ 冷青/綠）</strong>
+            • <strong>風格：</strong> 電影感（Teal & Orange）、森林系冷綠、日系底片質感。<br>
+            • <strong>適用：</strong> 夏天清涼海邊、晴空、陰雨天與極簡建築。
+          </div>
+          <div class="quadrant-card">
+            <strong>第三象限（左下：偏黃/暖 + 偏綠 ➔ 暖綠/橄欖綠）</strong>
+            • <strong>風格：</strong> 濃郁復古、自然大地色系、老底片色調。<br>
+            • <strong>適用：</strong> 復古街景、綠意盎然的森林與日光穿透樹葉。
+          </div>
+          <div class="quadrant-card">
+            <strong>第四象限（右下：偏黃/暖 + 偏紅 ➔ 暖橘/夕陽金黃）</strong>
+            • <strong>風格：</strong> 溫暖、熱烈、濃郁的金黃與暖橘光影。<br>
+            • <strong>適用：</strong> 夕陽落日、溫馨室內燈光、美食特寫。
+          </div>
+        </div>
+
+        <ul class="param-detail-list" style="margin-top:10px;">
+          <li><em>常見組合 (日系清新)</em>：R -1 / B +3（偏藍偏綠，打造乾淨透明感）。</li>
+          <li><em>常見組合 (復古暖陽)</em>：R +4 / B -5（偏紅偏黃，強化夕陽或溫暖濃郁底片感）。</li>
         </ul>
       </div>
 
@@ -279,23 +486,23 @@
         <div class="param-detail-title">富士系統 3 大飽和度設定</div>
         <ul class="param-detail-list">
           <li><strong>色彩 (Color)</strong>：控制畫面整體飽和度。</li>
-          <li><strong>彩色效果 (Color Chrome Effect)</strong>：控制暖色（如人的膚色、暖色調建築、稻穗、紅葉等）飽和度與層次，一般環境設 Weak 即可。</li>
-          <li><strong>色彩漸變特效藍色 (Color Chrome FX Blue)</strong>：控制冷色（藍色調飽和度提升），適合大晴天天空或藍海。</li>
+          <li><strong>彩色效果 (Color Chrome Effect)</strong>：控制暖色（膚色、暖色建築、紅葉等）飽和度與層次，一般設 Weak 即可。</li>
+          <li><strong>色彩漸變特效藍色 (Color Chrome FX Blue)</strong>：控制藍色調飽和度提升，適合大晴天天空與海洋。</li>
         </ul>
       </div>
 
       <div class="param-detail-group">
         <div class="param-detail-title">富士系統 3 大對比度設定 (解決亮過曝、暗太暗)</div>
         <ul class="param-detail-list">
-          <li><strong>動態範圍 (Dynamic Range, DR)</strong>：數字小 (DR100) 中間調細節保留少、對比強；數字大 (DR200/DR400) 中間調細節保留多、對比弱（防亮部過曝）。</li>
-          <li><strong>D範圍優先 (DR Priority)</strong>：同時自動調整亮部與暗部的無腦平衡模式（啟用時無法單獨調色調曲線）。</li>
-          <li><strong>色調曲線 (Tone Curve)</strong>：個別調整亮部 (Highlight) 與暗部 (Shadow)。常見 S 曲線（亮部拉亮 +1、暗部拉暗 +1）可讓畫面對比度變強、風格更濃烈。</li>
+          <li><strong>動態範圍 (Dynamic Range, DR)</strong>：DR100 對比強；DR200/DR400 保留高光與暗部細節（防過曝）。</li>
+          <li><strong>D範圍優先 (DR Priority)</strong>：自動平衡亮暗部的無腦模式（啟用時無法單獨調色調曲線）。</li>
+          <li><strong>色調曲線 (Tone Curve)</strong>：個別調整亮部 (Highlight) 與暗部 (Shadow)。S 曲線（Highlight +1, Shadow +1）可讓對比度更鮮明。</li>
         </ul>
       </div>
     </div>
 
-    <!-- 03 / 軟片模擬 20 種風格庫 -->
-    <div class="section-title">03 / 軟片模擬 20 種風格庫</div>
+    <!-- 04 / 軟片模擬 20 種風格庫 -->
+    <div class="section-title">04 / 軟片模擬 20 種風格庫</div>
     <div class="card">
       <div class="film-select-wrapper">
         <select id="filmSelect" class="fuji-select"></select>
@@ -307,8 +514,8 @@
       </div>
     </div>
 
-    <!-- 04 / 拍攝情境參數對照 -->
-    <div class="section-title">04 / 拍攝情境參數對照</div>
+    <!-- 05 / 拍攝情境參數對照 -->
+    <div class="section-title">05 / 拍攝情境參數對照</div>
     <div class="card">
       <div class="label-title">光線環境</div>
       <div class="tag-group" id="lightGroup">
@@ -342,10 +549,43 @@
       <div id="alertBox"></div>
     </div>
 
+    <!-- 06 / 實戰常見場景問題與操作對策 -->
+    <div class="section-title">06 / 實戰常見場景問題與操作對策</div>
+    <div class="card">
+      <div class="problem-card">
+        <div class="problem-title">📷 場景 1：大晴天拍人像，背景太亮過曝，人臉太暗？</div>
+        <div class="problem-solution">
+          <strong>操作調整：</strong>開大光圈 (F1.8-F2.8) ＋ EV 滾輪直接加到 <strong>+1.0 ~ +1.3</strong>。同時設定 <strong>DR400</strong> 或 <strong>DR200</strong> 鎖住背景天空高光不爆白。
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-title">📷 場景 2：室內餐廳拍攝美食，照片總是被黃光籠罩、食物看起來不新鮮？</div>
+        <div class="problem-solution">
+          <strong>操作調整：</strong>按 WB 鈕進入白平衡設定，將偏移座標往 <strong>B (藍色) +2 至 +4</strong> 偏移以抵銷黃光，色調曲線 <strong>Highlight -1, Shadow +1</strong> 讓光影更平緩。
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-title">📷 場景 3：夜間日本街道/居酒屋，照片模糊且對焦一直拉風琴？</div>
+        <div class="problem-solution">
+          <strong>操作調整：</strong>將光圈開到最大，快門速度強制鎖定在 <strong>1/60s 或 1/125s</strong>，ISO Auto 設定為 <strong>AUTO 3 (上限 6400)</strong>。若對焦困難，可開啟「AF輔助燈」或切換為單點對焦對準高對比邊緣。
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-title">📷 場景 4：晴天戶外使用大光圈拍攝時，畫面一片白且快門鍵按不下去？</div>
+        <div class="problem-solution">
+          <strong>操作調整：</strong>因為機械快門速度達到上限 (1/4000s) 導致過曝。請進入選單將快門類型改為 <strong>MS+ES (機械+電子快門)</strong>，快門可自動提升至 1/32000s。
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+
       // 富士 20 種軟片模擬資料庫
       const filmData = [
         { id: "classic_chrome", name: "CLASSIC CHROME", cat: "經典街拍", desc: "低飽和度、高陰影對比。非常適合日本街道、古建築，帶有濃厚的日系雜誌質感。" },
@@ -370,10 +610,10 @@
         { id: "sepia", name: "SEPIA", cat: "復古棕褐色", desc: "暖棕暖黃色調，呈現老照片質感。" }
       ];
 
-      // 1. 初始化下拉選單
+      // 初始化下拉選單
       const filmSelect = document.getElementById('filmSelect');
       if (filmSelect) {
-        filmSelect.innerHTML = ''; // 清空
+        filmSelect.innerHTML = '';
         filmData.forEach(f => {
           const opt = document.createElement('option');
           opt.value = f.id;
@@ -384,7 +624,6 @@
         filmSelect.addEventListener('change', (e) => updateFilmInfo(e.target.value));
       }
 
-      // 2. 更新膠片資訊顯示區
       function updateFilmInfo(id) {
         const f = filmData.find(item => item.id === id);
         if (f) {
@@ -398,10 +637,9 @@
         }
       }
 
-      // 預設載入第一個
       updateFilmInfo(filmData[0].id);
 
-      // 3. 狀態與矩陣切換邏輯
+      // 情境矩陣與即時對照
       const state = { light: 'sun', target: 'portrait', fb: null };
 
       function bindTags(groupId, key) {
@@ -437,7 +675,6 @@
       bindTags('targetGroup', 'target');
       bindTags('fbGroup', 'fb');
 
-      // 4. 渲染參數與微調結果
       function renderResult() {
         let mode = "A 模式 (光圈先決)";
         let focusMode = "S (單次對焦)";
@@ -452,7 +689,7 @@
 
         // 光線狀態
         if (state.light === 'sun') {
-          shutterType = "MS+ES (強光大光圈會自動切至 1/32000s 電子快門)";
+          shutterType = "MS+ES (強光大光圈自動切至 1/32000s 電子快門)";
           dynamicRange = "DR200 (保留亮部高光細節)";
         } else if (state.light === 'cloud') {
           iso = "AUTO 2 (上限 1600)";
